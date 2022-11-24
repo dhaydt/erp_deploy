@@ -16,7 +16,10 @@ class LaporanPekerjaanBarang extends Model
         'catatan_teknisi',
         'keterangan_customer',
         'qty',
-        'status'
+        'status',
+        'konfirmasi',
+        'peminjam',
+        'meminjamkan'
     ];
 
     protected $appends = ['status_formatted'];
@@ -41,5 +44,13 @@ class LaporanPekerjaanBarang extends Model
 
     public function barang(){
         return $this->belongsTo(Barang::class, 'id_barang');
+    }
+
+    public function userPeminjam(){
+        return $this->belongsTo(User::class, 'peminjam');
+    }
+
+    public function userMeminjamkan(){
+        return $this->belongsTo(User::class, 'meminjamkan');
     }
 }

@@ -1,15 +1,17 @@
 <div>
-    <h4 class="mb-5">Supplier Order</h4>
+    @if ($segment != 'order')
+        <h4 class="mb-5">Supplier Order</h4>
+    @endif
     @include('helper.alert-message')
     <div class="row mb-3">
         <div class="col-md-3">
             @include('helper.form-pencarian', ['model' => 'cari'])
         </div>
     </div>
-    <div class="table-responsive">
+    <div class="tables w-100" style="position: relative !important">
         <table class="table table-rounded table-striped border gy-7 gs-7">
          <thead>
-          <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
+          <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 sticky">
            <th>No</th>
            <th>Supplier</th>
            <th>Pembuat</th>

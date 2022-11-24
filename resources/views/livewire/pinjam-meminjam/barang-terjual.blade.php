@@ -17,14 +17,14 @@
             <th>SKU</th>
             <th>Nama</th>
             <th>Satuan</th>
-            <th>Dibalikan</th>
+            <th>Terjual</th>
             <th>Tanggal</th>
-            <th>Check</th>
+            {{-- <th>Check</th> --}}
             </tr>
             </thead>
             <tbody>
-            @if (count($listBarangDibalikan) > 0)
-                @foreach ($listBarangDibalikan as $index => $item)
+            @if (count($listBarangTerjual) > 0)
+                @foreach ($listBarangTerjual as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $item->barang->sku }}</td>
@@ -32,20 +32,20 @@
                         <td>{{ $item->barang->satuan->nama_satuan }}</td>
                         <td>{{ $item->perubahan }}</td>
                         <td>{{ $item->tanggal_perubahan_formatted }}</td>
-                        <td>
+                        {{-- <td>
                             <div class="form-check form-check-custom form-check-solid">
                                 <input class="form-check-input" type="checkbox" value="1" wire:click="simpanCheck({{ $item->id }})" @if($item->check == 1) checked @endif id="flexCheckDefault"/>
                             </div>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             @else
                 <tr>
-                    <td colspan="7" class="text-center text-gray-500">Tidak ada data</td>
+                    <td colspan="6" class="text-center text-gray-500">Tidak ada data</td>
                 </tr>
             @endif
             </tbody>
         </table>
     </div>
-    <div class="text-center">{{ $listBarangDibalikan->links() }}</div>
+    <div class="text-center">{{ $listBarangTerjual->links() }}</div>
 </div>

@@ -40,11 +40,14 @@ class FormOrder extends Component
 
     public function render()
     {
+        if ($this->id_supplier_order == null) {
+            $this->status_order = 1;
+        }
         $this->listSupplier = Supplier::get();
         $this->listStatusOrder = $this->helper->getListStatusOrder()->where('status_order', '!=', 4);
         $this->listTipePembayaran = TipePembayaran::get();
-        $this->dispatchBrowserEvent('contentChange');
 
+        $this->dispatchBrowserEvent('contentChange');
         return view('livewire.supplier.form-order');
     }
 
@@ -154,7 +157,7 @@ class FormOrder extends Component
         $this->id_supplier_order = $supplierOrder->id;
         $this->id_supplier = $supplierOrder->id_supplier;
         $this->status_order = $supplierOrder->status_order;
-        $this->tanggal_order = $supplierOrder->tanggal_order;
+        $this->tanggal_order = date('Y-m-d', strtotime($supplierOrder->tanggal_order));
         $this->keterangan = $supplierOrder->keterangan;
         $this->id_tipe_pembayaran = $supplierOrder->id_tipe_pembayaran;
     }

@@ -26,7 +26,8 @@
                    <th>No</th>
                    <th>Kode</th>
                    <th>Nama</th>
-                   <th>Keterangan</th>
+                   <th>Periode</th>
+                   {{-- <th>Keterangan</th> --}}
                    <th>Aksi</th>
                   </tr>
                  </thead>
@@ -37,7 +38,8 @@
                                 <td>{{ ($page - 1) * $total_show + $index + 1 }}</td>
                                 <td>{{ $item->kode }}</td>
                                 <td>{{ $item->nama }}</td>
-                                <td>{{ $item->keterangan ?? '-' }}</td>
+                                <td>{{ $item->periode }} Bulan</td>
+                                {{-- <td>{{ $item->keterangan ?? '-' }}</td> --}}
                                 <td>
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Form" wire:click="$emit('onClickEdit', {{ $item->id }})">

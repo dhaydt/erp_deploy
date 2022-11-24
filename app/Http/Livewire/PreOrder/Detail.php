@@ -10,9 +10,14 @@ use Livewire\Component;
 
 class Detail extends Component
 {
-    public $listeners = ['changeStatusPreOrder', 'preOrderSelesai'];
+    public $listeners = [
+        'changeStatusPreOrder',
+        'preOrderSelesai',
+        'refreshPreOrder' => '$refresh'
+    ];
     public $id_pre_order;
     public $preOrder;
+    public $total_bayar = 0;
     public function render()
     {
         $this->preOrder = PreOrder::find($this->id_pre_order);
@@ -21,6 +26,10 @@ class Detail extends Component
 
     public function mount($id_pre_order){
         $this->id_pre_order = $id_pre_order;
+        $preOrder = PreOrder::find($this->id_pre_order);
+        foreach ($preOrder->preOrderBayar as $item) {
+            $this->total_bayar += $item->pembayaran_sekarang;
+        }
     }
 
     public function changeStatusPreOrder($id, $status){
@@ -78,7 +87,7 @@ class Detail extends Component
             'status' => 3
         ]);
 
-        $message = "Berhasil menyimpan data dan mengupdate stock barang";
+        $message = "Berhasil menyimpan data";
         $this->emit('refreshPreOrderLog');
         $this->emit('refreshPreOrderDetail');
         $this->emit('finishRefreshData', 1, $message);

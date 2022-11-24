@@ -28,7 +28,7 @@
                    <th>Email</th>
                    <th>Nomor HP</th>
                    <th>Alamat</th>
-                   <th>Barang</th>
+                   <th>Barang Perlengkapan</th>
                    <th>Status</th>
                    <th>Aksi</th>
                   </tr>
@@ -44,11 +44,12 @@
                                 <td>{{ $item->no_hp }}</td>
                                 <td>{{ $item->alamat }}</td>
                                 <td>
-                                    <ul>
+                                    {{ $item->barang_customer }}
+                                    {{-- <ul>
                                         @foreach ($item->list_barang as $nama_barang)
                                             <li>{{ $nama_barang }}</li>
                                         @endforeach
-                                    </ul>
+                                    </ul> --}}
                                 </td>
                                 <td><?= $item->status_formatted ?></td>
                                 <td>

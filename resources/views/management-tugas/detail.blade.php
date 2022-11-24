@@ -62,6 +62,14 @@
                             : {{ $laporanPekerjaan->customer->alamat }}
                         </div>
                     </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4 col-4">
+                            List Perlengkapan
+                        </div>
+                        <div class="col-md-8 col-8 fw-bold">
+                            : {{ $laporanPekerjaan->customer->barang_customer }}
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4 mb-10">
                     <div class="mb-5 fw-bold">
@@ -72,7 +80,7 @@
                             Nama
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
-                            : {{ $laporanPekerjaan->project->nama }}
+                            : {{ $laporanPekerjaan->project ? $laporanPekerjaan->project->nama : '-' }}
                         </div>
                     </div>
                     <div class="row mb-5">
@@ -80,7 +88,7 @@
                             Kode
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
-                            : {{ $laporanPekerjaan->project->kode }}
+                            : {{ $laporanPekerjaan->project ? $laporanPekerjaan->project->kode : '-' }}
                         </div>
                     </div>
                     <div class="row mb-5">
@@ -88,7 +96,7 @@
                             No Unit
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
-                            : {{ $laporanPekerjaan->project->no_unit }}
+                            : {{ $laporanPekerjaan->project ? $laporanPekerjaan->project->no_unit : '-' }}
                         </div>
                     </div>
                     <div class="row mb-5">
@@ -96,7 +104,7 @@
                             No MFG
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
-                            : {{ $laporanPekerjaan->project->no_mfg }}
+                            : {{ $laporanPekerjaan->project ? $laporanPekerjaan->project->no_mfg : '-' }}
                         </div>
                     </div>
                     <div class="row mb-5">
@@ -104,7 +112,7 @@
                             Alamat
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
-                            : {{ $laporanPekerjaan->project->alamat }}
+                            : {{ $laporanPekerjaan->project ? $laporanPekerjaan->project->alamat : '-' }}
                         </div>
                     </div>
                 </div>
@@ -154,6 +162,18 @@
                             @endforeach
                         </div>
                     </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4 col-4">
+                            Periode
+                        </div>
+                        <div class="col-md-8 col-8 fw-bold">
+                            : @if ($laporanPekerjaan->is_emergency_call == 1)
+                                <span class="badge badge-warning">Laporan Pekerjaan</span>
+                            @else
+                                {{ $laporanPekerjaan->periode }} Bulan
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
             <hr class="my-10">
@@ -180,6 +200,16 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col-md-4 col-4">
+                            Tanggal Estimasi
+                        </div>
+                        <div class="col-md-8 col-8">
+                            : @if ($laporanPekerjaan->tanggal_estimasi)
+                                {{ date('d-m-Y H:i', strtotime($laporanPekerjaan->tanggal_estimasi)) }}
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4 col-4">
                             Keterangan Teknisi
                         </div>
                         <div class="col-md-8 col-8">
@@ -194,7 +224,7 @@
                             : {{ $laporanPekerjaan->catatan_customer }}
                         </div>
                     </div>
-                    <div class="row mb-5">
+                    {{-- <div class="row mb-5">
                         <div class="col-md-4 col-4">
                             Signature
                         </div>
@@ -205,7 +235,7 @@
                                 Belum ada tanda tangan
                             @endif
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="col-md-4">
                     <div class="mb-5 fw-bold">
@@ -240,8 +270,6 @@
                            <th>No</th>
                            <th>SKU</th>
                            <th>Nama Barang</th>
-                           <th>Satuan</th>
-                           <th>Harga</th>
                            <th>Jumlah / Qty</th>
                           </tr>
                          </thead>
@@ -252,8 +280,6 @@
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $item->barang->sku }}</td>
                                         <td>{{ $item->barang->nama }}</td>
-                                        <td>{{ $item->barang->satuan->nama_satuan }}</td>
-                                        <td>{{ $item->barang->harga_formatted }}</td>
                                         <td>{{ $item->qty }}</td>
                                     </tr>
                                 @endforeach

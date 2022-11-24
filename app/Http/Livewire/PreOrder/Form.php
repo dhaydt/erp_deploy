@@ -40,22 +40,27 @@ class Form extends Component
     public function render()
     {
         $this->listTipePembayaran = TipePembayaran::get();
-        $this->listQuotation = Quotation::where('status', 0)->get();
+        $this->listQuotation = Quotation::whereDoesntHave('preOrder')
+        ->where(function($query){
+                $query->where('id_customer', $this->id_customer)
+                ->orWhereHas('laporanPekerjaan', function($query){
+                    $query->where('id_customer', $this->id_customer);
+                });
+            })->get();
+        // $this->listQuotation = Quotation::get();
         $this->listCustomer = Customer::get();
         $this->listMetodePembayaran = MetodePembayaran::get();
 
-        if($this->id_quotation){
-            $quotation = Quotation::find($this->id_quotation);
-            if($quotation && $quotation->customer){
-                $this->id_customer = $quotation->id_customer;
-            }
-        }
         $this->dispatchBrowserEvent('contentChange');
         return view('livewire.pre-order.form');
     }
 
     public function mount(){
-
+        $quotationSuccess = Quotation::where('status_like', 1)->first();
+        if($quotationSuccess){
+            $this->id_customer = $quotationSuccess->id_customer;
+            $this->id_quotation = $quotationSuccess->id;
+        }
     }
 
     public function simpanDataPreOrder(){
@@ -132,6 +137,13 @@ class Form extends Component
             'tanggal' => now(),
             'status' => 1
         ]);
+
+        $quotation = Quotation::find($this->id_quotation);
+        if($quotation){
+            $quotation->update([
+                'status_like' => 2
+            ]);
+        }
         $message = "Berhasil menyimpan data";
         $this->resetInputFields();
         $this->emit('refreshPreOrder');

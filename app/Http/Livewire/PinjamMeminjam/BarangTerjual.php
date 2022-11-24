@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Inventory;
+namespace App\Http\Livewire\PinjamMeminjam;
 
 use App\Models\BarangStockLog;
 use Livewire\Component;
@@ -25,7 +25,7 @@ class BarangTerjual extends Component
             });
         })->where('id_tipe_perubahan_stock', 4)->paginate($this->total_show);
         $data['listBarangTerjual'] = $this->listBarangTerjual;
-        return view('livewire.inventory.barang-terjual', $data);
+        return view('livewire.pinjam-meminjam.barang-terjual', $data);
     }
 
     public function mount(){

@@ -3,7 +3,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">Form Pre Order</h3>
+                    <h3 class="modal-title">Form PO</h3>
 
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                         <span class="svg-icon svg-icon-1">
@@ -121,6 +121,9 @@
     <script>
         $(document).ready(function () {
             refreshSelect()
+            if(@this.get('id_customer') != null && @this.get('id_quotation') != null){
+                $('#modal_form').modal('show')
+            }
         });
         Livewire.on('finishSimpanData', (status, message) => {
             $('.modal').modal('hide');
@@ -167,5 +170,9 @@
                 @this.set('id_metode_pembayaran', $(this).val())
             });
         }
+
+        Livewire.on('buatPreOrder', () => {
+            $('#modal_form').modal('show')
+        })
     </script>
 @endpush

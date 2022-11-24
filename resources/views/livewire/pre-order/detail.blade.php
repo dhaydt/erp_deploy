@@ -4,7 +4,7 @@
             <a href="{{ route('pre-order') }}" class="btn btn-sm btn-icon btn-light me-5" data-bs-toggle="tooltip" data-bs-placement="top" title="Kembali">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
-            Detail Pre Order
+            Detail PO
         </h3>
         <div class="card-toolbar">
             <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Bayar Pre Order" wire:click="$emit('onClickBayar')">
@@ -13,19 +13,21 @@
             <button class="btn btn-sm btn-outline btn-outline-success btn-edit mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Pre Order" wire:click="$emit('onClickEditPreOrder', {{ $preOrder }})">
                 <i class="bi bi-pencil-square"></i> Edit
             </button>
-            <button class="btn btn-sm btn-danger mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Batalkan Pre Order" wire:click="$emit('onClickBatalPreOrder', {{ $preOrder->id }})">
-                <i class="fa-solid fa-ban"></i> Batalkan
-            </button>
-            @if ($preOrder->status == 1)
-                <button class="btn btn-sm btn-warning btn-proses mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Pre Order" wire:click="$emit('onClickChangeStatus', {{ $id_pre_order }}, 2)">
-                    <i class="fa-solid fa-rotate"></i> Proses
+            @if ($total_bayar > 0)
+                <button class="btn btn-sm btn-danger mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Batalkan Pre Order" wire:click="$emit('onClickBatalPreOrder', {{ $preOrder->id }})">
+                    <i class="fa-solid fa-ban"></i> Batalkan
                 </button>
-            @elseif($preOrder->status == 2)
-                <button class="btn btn-sm btn-success btn-success mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Pre Order Selesai" wire:click="$emit('onClickSelesai', {{ $id_pre_order }}, 3)">
-                    <i class="fa-solid fa-circle-check"></i> Selesai
-                </button>
-            @elseif($preOrder->status == 3)
-                <a href="{{ route('pre-order.invoice', ['id' => $preOrder->id]) }}" target="_blank" class="btn btn-sm btn-info btn-proses mx-2"><i class="fa-solid fa-print"></i>Cetak Invoice</a>
+                @if ($preOrder->status == 1)
+                    <button class="btn btn-sm btn-warning btn-proses mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ganti Status PO" wire:click="$emit('onClickChangeStatus', {{ $id_pre_order }}, 2)">
+                        <i class="fa-solid fa-rotate"></i> Proses
+                    </button>
+                @elseif($preOrder->status == 2)
+                    <button class="btn btn-sm btn-success btn-success mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="PO Selesai" wire:click="$emit('onClickSelesai', {{ $id_pre_order }}, 3)">
+                        <i class="fa-solid fa-circle-check"></i> Selesai
+                    </button>
+                @elseif($preOrder->status == 3)
+                    <a href="{{ route('pre-order.invoice', ['id' => $preOrder->id]) }}" target="_blank" class="btn btn-sm btn-info btn-proses mx-2"><i class="fa-solid fa-print"></i>Cetak Invoice</a>
+                @endif
             @endif
         </div>
     </div>
@@ -92,10 +94,38 @@
                 </div>
                 <div class="row mb-5">
                     <div class="col-md-4 col-4">
-                        Status
+                        Status Pekerjaan
                     </div>
                     <div class="col-md-8 col-8">
-                        : <span class="fw-bold"><?= $preOrder->status_formatted ?></span>
+                        : <span class="fw-bold">
+                            @if ($preOrder->quotation && $preOrder->quotation->laporanPekerjaan)
+                                @if ($preOrder->quotation->laporanPekerjaan->signature != null && $preOrder->quotation->laporanPekerjaan->jam_selesai != null)
+                                    <span class="badge badge-success">Selesai</span>
+                                @elseif($preOrder->quotation->laporanPekerjaan->jam_mulai != null)
+                                    <span class="badge badge-warning">Sedang Dikerjakan</span>
+                                @else
+                                    <span class="badge badge-secondary">Belum Dikerjakan</span>
+                                @endif
+                            @else
+                                Tidak ada pekerjaan
+                            @endif
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <div class="col-md-4 col-4">
+                        Total
+                    </div>
+                    <div class="col-md-8 col-8">
+                        : <span class="fw-bold">Rp.{{ number_format($preOrder->total,0,',','.') }}</span>
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <div class="col-md-4 col-4">
+                        PPN 11%
+                    </div>
+                    <div class="col-md-8 col-8">
+                        : <span class="fw-bold">Rp.{{ number_format($preOrder->ppn,0,',','.') }}</span>
                     </div>
                 </div>
                 <div class="row mb-5">

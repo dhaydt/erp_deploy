@@ -20,14 +20,14 @@ class LaporanPekerjaan extends Component
         'simpanLaporanPekerjaan',
         'hapusFotoByIndex',
         'base64ToImage',
-        'hapusFoto'
+        'hapusFoto',
     ];
     public $tanggal;
     public $id_laporan_pekerjaan;
     public $jam_mulai;
     public $jam_selesai;
     public $catatan_pelanggan;
-    public $keterangan;
+    public $keterangan_laporan_pekerjaan;
     public $foto = [];
     public $keterangan_foto;
     public $signature;
@@ -42,7 +42,7 @@ class LaporanPekerjaan extends Component
     public function mount($id_laporan_pekerjaan){
         $this->id_laporan_pekerjaan = $id_laporan_pekerjaan;
         $this->laporanPekerjaan = ModelsLaporanPekerjaan::find($this->id_laporan_pekerjaan);
-        $this->keterangan = $this->laporanPekerjaan->keterangan;
+        $this->keterangan_laporan_pekerjaan = $this->laporanPekerjaan->keterangan;
         $this->catatan_pelanggan = $this->laporanPekerjaan->catatan_pelanggan;
         $this->tanggal = $this->laporanPekerjaan->jam_mulai;
         $this->jam_mulai = $this->laporanPekerjaan->jam_mulai;
@@ -52,12 +52,12 @@ class LaporanPekerjaan extends Component
 
     public function simpanLaporanPekerjaan(){
         $this->validate([
-            'keterangan' => 'required|string',
+            'keterangan_laporan_pekerjaan' => 'required|string',
             'catatan_pelanggan' => 'required|string',
             'foto.*' => 'required|image|mimes:jpg,png,jpeg|max:10240'
         ], [
-            'keterangan.required' => 'Keterangan tidak boleh kosong',
-            'keterangan.string' => 'Keterangan tidak valid !',
+            'keterangan_laporan_pekerjaan.required' => 'Keterangan tidak boleh kosong',
+            'keterangan_laporan_pekerjaan.string' => 'Keterangan tidak valid !',
             'catatan_pelanggan.required' => 'Catatan tidak boleh kosong',
             'catatan_pelanggan.string' => 'Catatn tidak valid !',
             'foto.*.required' => 'Foto tidak boleh kosong',
@@ -72,29 +72,29 @@ class LaporanPekerjaan extends Component
             return session()->flash('fail', $message);
         }
 
-        $data['keterangan'] = $this->keterangan;
+        $data['keterangan'] = $this->keterangan_laporan_pekerjaan;
         $data['catatan_pelanggan'] = $this->catatan_pelanggan;
         if($this->signature){
             $this->jam_selesai = now();
             $data['signature'] = $this->signature;
             $data['jam_selesai'] = $this->jam_selesai;
             $laporanPekerjaan->update($data);
-            // foreach ($laporanPekerjaan->laporanPekerjaanBarang as $barang) {
-            //     if($barang->barang && $barang->status == 2){
-            //         BarangStockLog::create([
-            //             'id_barang' => $barang->id_barang,
-            //             'stock_awal' => $barang->barang->stock + $barang->qty,
-            //             'perubahan' => $barang->qty,
-            //             'tanggal_perubahan' => now(),
-            //             'id_tipe_perubahan_stock' => 4,
-            //             'id_user' => session()->get('id_user')
-            //         ]);
+            foreach ($laporanPekerjaan->laporanPekerjaanBarang as $barang) {
+                if($barang->barang && $barang->status == 2){
+                    BarangStockLog::create([
+                        'id_barang' => $barang->id_barang,
+                        'stock_awal' => $barang->barang->stock + $barang->qty,
+                        'perubahan' => $barang->qty,
+                        'tanggal_perubahan' => now(),
+                        'id_tipe_perubahan_stock' => 4,
+                        'id_user' => session()->get('id_user')
+                    ]);
 
-            //         $barang->update([
-            //             'status' => 4
-            //         ]);
-            //     }
-            // }
+                    $barang->update([
+                        'status' => 4
+                    ]);
+                }
+            }
             $this->emit('refreshLaporanPekerjaanBarang');
             $this->createQuotation();
         }else{
@@ -108,7 +108,7 @@ class LaporanPekerjaan extends Component
                 LaporanPekerjaanFoto::create([
                     'id_laporan_pekerjaan' => $this->id_laporan_pekerjaan,
                     'file' => $path,
-                    'keterangan' => $this->keterangan
+                    'keterangan' => $this->keterangan_foto
                 ]);
             }
         }
@@ -150,6 +150,8 @@ class LaporanPekerjaan extends Component
                 }
             }
         }
+
+        return redirect()->route('management-tugas.export', ['id' => $laporanPekerjaan->id]);
     }
 
     public function resetInputFields(){

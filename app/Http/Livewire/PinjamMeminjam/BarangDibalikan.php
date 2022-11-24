@@ -1,31 +1,38 @@
 <?php
 
-namespace App\Http\Livewire\Inventory;
+namespace App\Http\Livewire\PinjamMeminjam;
 
 use App\Models\BarangStockLog;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class BarangMasuk extends Component
+class BarangDibalikan extends Component
 {
     use WithPagination;
-    public $listeners = ['simpanCheck'];
+    public $listeners = [
+        'simpanCheck',
+        'refreshBarangDibalikan' => '$refresh'
+    ];
     public $paginationTheme = 'bootstrap';
-    public $cari;
     public $total_show = 10;
-    protected $listBarangMasuk;
+    public $cari;
+    protected $listBarangDibalikan;
     public function render()
     {
-        $this->listBarangMasuk = BarangStockLog::where(function($query){
+        $this->listBarangDibalikan = BarangStockLog::where(function($query){
             $query->where('perubahan', 'LIKE', '%' . $this->cari . '%')
             ->orWhere('tanggal_perubahan', 'LIKE', '%' . $this->cari . '%')
             ->orWhereHas('barang', function($query){
                 $query->where('nama', 'LIKE', '%' . $this->cari . '%')
                 ->orWhere('deskripsi', 'LIKE', '%' . $this->cari . '%');
             });
-        })->where('id_tipe_perubahan_stock', 3)->orderBy('created_at', 'DESC')->paginate($this->total_show);
-        $data['listBarangMasuk'] = $this->listBarangMasuk;
-        return view('livewire.inventory.barang-masuk', $data);
+        })->where('id_tipe_perubahan_stock', 5)->paginate($this->total_show);
+        $data['listBarangDibalikan'] = $this->listBarangDibalikan;
+        return view('livewire.pinjam-meminjam.barang-dibalikan', $data);
+    }
+
+    public function mount(){
+
     }
 
     public function simpanCheck($id){

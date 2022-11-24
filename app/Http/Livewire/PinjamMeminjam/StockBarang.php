@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Inventory;
+namespace App\Http\Livewire\PinjamMeminjam;
 
 use App\Models\Barang;
 use Livewire\Component;
@@ -9,11 +9,14 @@ use Livewire\WithPagination;
 class StockBarang extends Component
 {
     use WithPagination;
-    public $listeners = ['refreshStockBarang' => '$refresh'];
+    public $listeners = [
+        'refreshStockBarang' => '$refresh'
+    ];
     public $paginationTheme = 'bootstrap';
     public $cari;
     public $total_show = 10;
     protected $listBarang;
+    public $stockKurang = false;
     public function render()
     {
         $this->listBarang = Barang::where(function($query){
@@ -26,10 +29,12 @@ class StockBarang extends Component
                 $query->where('nama_satuan', 'LIKE', '%' . $this-> cari . '%');
             })->orWhereHas('tipeBarang', function($query){
                 $query->where('tipe_barang', 'LIKE', '%' . $this->cari . '%');
+            })->orWhereHas('merk', function($query){
+                $query->where('nama_merk', 'LIKE', '%' . $this->cari . '%');
             });
         })->orderBy('stock', 'ASC')->paginate($this->total_show);
         $data['listBarang'] = $this->listBarang;
-        return view('livewire.inventory.stock-barang', $data);
+        return view('livewire.pinjam-meminjam.stock-barang', $data);
     }
 
     public function mount(){

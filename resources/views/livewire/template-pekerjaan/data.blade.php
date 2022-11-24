@@ -21,27 +21,14 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-rounded table-striped border gy-7 gs-7">
+            <table class="table table-rounded border gy-7 gs-7">
                 <thead>
                     <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
                         <th>No</th>
                         <th>Nama Pekerjaan</th>
                         {{-- <th>Keterangan</th> --}}
-                        @if ($periode > 0)
-                        <th>Checklist 1 Bulan</th>
-                        @endif
-                        @if ($periode > 1)
-                        <th>Checklist 2 Bulan</th>
-                        @endif
-                        @if ($periode > 2)
-                        <th>Checklist 3 Bulan</th>
-                        @endif
-                        @if ($periode > 5)
-                        <th>Checklist 6 Bulan</th>
-                        @endif
-                        @if ($periode > 11)
-                        <th>Checklist 1 Tahun</th>
-                        @endif
+                        <th>Kondisi</th>
+                        <th>Periode {{ $periode }} Bulan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -49,9 +36,17 @@
                     @if (count($listTemplatePekerjaan) > 0)
                     @foreach ($listTemplatePekerjaan as $index => $item)
                     {{-- {{ dd($item) }} --}}
-                    <tr class="fw-bold">
-                        <td class="bg-success">{{ \App\CPU\Helpers::numberToLetter($index + 1) }}</td>
-                        <td class="bg-success">{{ $item->nama_pekerjaan }}</td>
+                    <tr class="fw-bold bg-light-success">
+                        <td>{{ \App\CPU\Helpers::numberToLetter($index + 1) }}</td>
+                        <td>{{ $item->nama_pekerjaan }}</td>
+                        <td>
+                            @if ($item->kondisi != null && is_array(json_decode($item->kondisi)))
+                                @foreach (json_decode($item->kondisi) as $kondisi)
+                                    {{ $kondisi }}
+                                @endforeach
+                            @endif
+                        </td>
+                        <td></td>
                         {{-- <td>
                             @php
                                 $kerja = json_decode($item->keterangan);
@@ -62,22 +57,7 @@
                                 @endforeach
                             @endif
                         </td> --}}
-                        @if ($periode > 0)
-                        <td class="bg-success"></td>
-                        @endif
-                        @if ($periode > 1)
-                        <td class="bg-success"></td>
-                        @endif
-                        @if ($periode > 2)
-                        <td class="bg-success"></td>
-                        @endif
-                        @if ($periode > 5)
-                        <td class="bg-success"></td>
-                        @endif
-                        @if ($periode > 11)
-                        <td class="bg-success"></td>
-                        @endif
-                        <td class="bg-success">
+                        <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip"
                                     data-bs-placement="top" title="Edit Template Pekerjaan"
@@ -101,6 +81,21 @@
                     <tr>
                         <td class="text-end">{{ $nomor + 1 }}</td>
                         <td>{{ $detail->nama_pekerjaan }}</td>
+                        <td>
+                            @if (is_array($detail->kondisi))
+                                @foreach (json_decode($detail->kondisi) as $kondisi)
+                                    {{ $kondisi }}
+                                @endforeach
+                            @endif
+                        </td>
+                        <td>
+                            {{ $detail->periode }} Bulan
+                            {{-- @if ($periode == $detail->periode)
+                                <i class="fas fa-check-circle fs-2x text-success"></i>
+                            @else
+                                <i class="fas fa-times-circle fs-2x text-danger"></i>
+                            @endif --}}
+                        </td>
                         {{-- <td>
                             @php
                                 $kerjah = json_decode($detail->keterangan)
@@ -113,31 +108,6 @@
                                 </div>
                             @endif
                         </td> --}}
-                        @if ($periode > 0)
-                        <td>
-                            <span class="badge me-1 badge-info  text-light">{{ $detail->checklist_1_bulan ? App\CPU\Helpers::getKondisi($detail->checklist_1_bulan) : '' }}</span>
-                        </td>
-                        @endif
-                        @if ($periode > 1)
-                        <td>
-                            <span class="badge me-1 badge-info  text-light">{{ $detail->checklist_2_bulan ? App\CPU\Helpers::getKondisi($detail->checklist_2_bulan) : '' }}</span>
-                        </td>
-                        @endif
-                        @if ($periode > 2)
-                        <td>
-                            <span class="badge me-1 badge-info  text-light">{{ $detail->checklist_3_bulan ? App\CPU\Helpers::getKondisi($detail->checklist_3_bulan) : '' }}</span>
-                        </td>
-                        @endif
-                        @if ($periode > 5)
-                        <td>
-                            <span class="badge me-1 badge-info  text-light">{{ $detail->checklist_6_bulan ? App\CPU\Helpers::getKondisi($detail->checklist_6_bulan) : '' }}</span>
-                        </td>
-                        @endif
-                        @if ($periode > 11)
-                        <td>
-                            <span class="badge me-1 badge-info  text-light">{{ $detail->checklist_1_tahun ? App\CPU\Helpers::getKondisi($detail->checklist_1_tahun) : '' }}</span>
-                        </td>
-                        @endif
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip"

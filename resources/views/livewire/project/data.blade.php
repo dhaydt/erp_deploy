@@ -49,8 +49,11 @@
                                 <td>{{ $item->catatan }}</td>
                                 <td>{{ $item->no_unit }}</td>
                                 <td>{{ $item->no_mfg }}</td>
-                                <td>{{ $item->sales }}</td>
-                                <td>{{ date('d-m-Y', strtotime($item->tanggal)) }}</td>
+                                <td>
+                                    @foreach ($item->salesProject as $salesProject)
+                                        {{ $salesProject->sales->nama }},
+                                    @endforeach
+                                </td>
                                 <td>
                                     @if ($item->map)
                                         <a href="{{ $item->map }}" class="btn btn-sm btn-icon btn-outline btn-outline-success" target="_blank">
@@ -58,6 +61,11 @@
                                         </a>
                                     @else
                                         -
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($item->tanggal)
+                                        {{ date('d-m-Y', strtotime($item->tanggal)) }}
                                     @endif
                                 </td>
                                 <td>
@@ -69,11 +77,12 @@
                                             }
                                         }
                                     @endphp
-                                    <ul>
+                                    {{ $total_pekerjaan_selesai }} / {{ $item->total_pekerjaan }}
+                                    {{-- <ul>
                                         <li>Pekerjaan Berjalan {{ $item->laporanPekerjaan->count() - $total_pekerjaan_selesai }}</li>
                                         <li>Pekerjaan Selesai {{ $total_pekerjaan_selesai }}</li>
                                         <li>Total Pekerjaan {{ $item->laporanPekerjaan->count() }}</li>
-                                    </ul>
+                                    </ul> --}}
                                 </td>
                                 <td>
                                     <div class="btn-group">

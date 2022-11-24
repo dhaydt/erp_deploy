@@ -34,14 +34,14 @@
                         </div>
                         <div class="mb-5">
                             <label for="" class="form-label required">Tanggal Order</label>
-                            <input type="text" autocomplete="off" class="form-control form-control-solid" name="tanggal_order" wire:model="tanggal_order" placeholder="Tanggal Order" required>
+                            <input type="date" autocomplete="off" class="form-control form-control-solid" name="tanggal_order" wire:model="tanggal_order" placeholder="Tanggal Order" required>
                             @error('tanggal_order')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-5">
                             <label for="" class="form-label required">Status Order</label>
-                            <select name="status_order" class="form-select form-select-solid supplier-order" wire:model="status_order" data-control="select2" data-dropdown-parent="#modal_form_order" data-placeholder="Pilih" required>
+                            <select name="status_order" class="form-select form-select-solid supplier-order" wire:model="status_order" data-control="select2" data-dropdown-parent="#modal_form_order" data-placeholder="Pilih" @if($id_supplier_order == null) disabled @endif required>
                                 <option value="">Pilih</option>
                                 @foreach ($listStatusOrder as $item)
                                     <option value="{{ $item['status_order'] }}" @if($item['status_order'] == $status_order) selected @endif>{{ $item['keterangan'] }}</option>
@@ -84,7 +84,6 @@
 @push('js')
     <script>
         $(document).ready(function () {
-            $('input[name="tanggal_order"]').flatpickr()
             $('select[name="id_supplier"]').on('change', function(){
                 Livewire.emit('changeSupplier', $(this).val())
             })
@@ -99,7 +98,6 @@
         });
 
         window.addEventListener('contentChange',function(){
-            $('input[name="tanggal_order"]').flatpickr()
             $('select[name="id_supplier"]').select2()
             // $('select[name="status_order"]').select2()
             $('.supplier-order').select2()

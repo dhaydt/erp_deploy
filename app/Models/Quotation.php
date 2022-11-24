@@ -21,7 +21,8 @@ class Quotation extends Model
         'file',
         'hal',
         'konfirmasi',
-        'sales'
+        'sales',
+        'status_like'
     ];
 
     protected $appends = ['status_formatted', 'no_ref', 'updated_at_formatted', 'dibuat_pada'];
@@ -65,5 +66,13 @@ class Quotation extends Model
     public function getUpdatedAtFormattedAttribute(){
         $carbon = Carbon::parse($this->updated_at)->locale('id')->isoFormat('DD MMMM YYYY');
         return $carbon;
+    }
+
+    public function preOrder(){
+        return $this->hasOne(PreOrder::class, 'id_quotation');
+    }
+
+    public function quotationSales(){
+        return $this->hasMany(QuotationSales::class, 'id_quotation');
     }
 }

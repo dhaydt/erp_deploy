@@ -29,6 +29,9 @@ class Form extends Component
     public $signature;
     public $periode;
     public $tanggal;
+    public $is_emergency_call;
+    public $tanggal_estimasi;
+    public $no_mfg;
 
     public $listIdUser = [];
 
@@ -45,6 +48,12 @@ class Form extends Component
         $this->listMerk = Merk::get();
         $this->listUser = User::get();
         $this->listFormMaster = FormMaster::get();
+
+        if($this->id_project){
+            $project = ProjectV2::find($this->id_project);
+            $this->no_mfg = $project->no_mfg;
+        }
+
         $this->dispatchBrowserEvent('contentChange');
 
         return view('livewire.management-tugas.form');
@@ -63,6 +72,7 @@ class Form extends Component
             'id_form_master' => 'required|numeric',
             'nomor_lift' => 'required|numeric',
             'tanggal' => 'required',
+            'tanggal_estimasi' => 'nullable|string'
         ], [
             'id_customer.required' => 'Customer belum dipilih',
             'id_customer.numeric' => 'Customer tidak valid !',
@@ -75,7 +85,12 @@ class Form extends Component
             'id_form_master.required' => 'Form belum dipilih',
             'tanggal.required' => 'Tanggal Pekerjaan belum dipilih',
             'id_form_master.numeric' => 'Form tidak valid !',
+            'tanggal_estimasi.string' => 'Tanggal estimasi tidak valid !'
         ]);
+
+        if($this->is_emergency_call == 1){
+            $this->periode = 0;
+        }
 
         $customer = Customer::find($this->id_customer);
         if (!$customer) {
@@ -115,6 +130,8 @@ class Form extends Component
             'periode' => $this->periode,
             'tanggal_pekerjaan' => $this->tanggal,
             'id_form_master' => $this->id_form_master,
+            'is_emergency_call' => $this->is_emergency_call ?? 0,
+            'tanggal_estimasi' => date('Y-m-d H:i:s', strtotime($this->tanggal_estimasi))
         ]);
 
         LaporanPekerjaanUser::where('id_laporan_pekerjaan', $laporanPekerjaan->id)
@@ -144,6 +161,8 @@ class Form extends Component
         $this->tanggal = null;
         $this->id_form_master = null;
         $this->listIdUser = [];
+        $this->is_emergency_call = null;
+        $this->tanggal_estimasi = null;
     }
 
     public function setDataManagementTugas($id)
@@ -163,6 +182,10 @@ class Form extends Component
         $this->id_form_master = $laporanPekerjaan->id_form_master;
         $this->periode = $laporanPekerjaan->periode;
         $this->tanggal = $laporanPekerjaan->tanggal_pekerjaan;
+        $this->is_emergency_call = $laporanPekerjaan->is_emergency_call;
+        if($laporanPekerjaan->tanggal_estimasi){
+            $this->tanggal_estimasi = date('d-m-Y H:i', strtotime($laporanPekerjaan->tanggal_estimasi));
+        }
 
         foreach ($laporanPekerjaan->teknisi as $item) {
             array_push($this->listIdUser, $item->id_user);

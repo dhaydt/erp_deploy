@@ -12,7 +12,8 @@ class Pembayaran extends Component
 {
     public $listeners = [
         'simpanPreOrderBayar',
-        'pembayaranLunas'
+        'pembayaranLunas',
+        'refreshPreOrderPembayaran' => '$refresh'
     ];
     public $id_pre_order;
     public $preOrder;
@@ -74,27 +75,28 @@ class Pembayaran extends Component
                     'status' => 1
                 ]);
 
-                $barang = Barang::find($preOrderDetail->id_barang);
-                BarangStockLog::create([
-                    'id_barang' => $preOrderDetail->id_barang,
-                    'stock_awal' => $barang->stock + $preOrderDetail->qty,
-                    'perubahan' => $preOrderDetail->qty,
-                    'tanggal_perubahan' => now(),
-                    'id_tipe_perubahan_stock' => 4,
-                    'id_user' => session()->get('id_user'),
-                ]);
+                // $barang = Barang::find($preOrderDetail->id_barang);
+                // BarangStockLog::create([
+                //     'id_barang' => $preOrderDetail->id_barang,
+                //     'stock_awal' => $barang->stock + $preOrderDetail->qty,
+                //     'perubahan' => $preOrderDetail->qty,
+                //     'tanggal_perubahan' => now(),
+                //     'id_tipe_perubahan_stock' => 4,
+                //     'id_user' => session()->get('id_user'),
+                // ]);
 
-                if($this->preOrder->quotation && $this->preOrder->quotation->laporanPekerjaan && $this->preOrder->quotation->laporanPekerjaan->laporanPekerjaanBarang->where('id_barang', $preOrderDetail->id_barang)->first()){
-                    $laporanPekerjaanBarang = $this->preOrder->quotation->laporanPekerjaan->laporanPekerjaanBarang->where('id_barang', $preOrderDetail->id_barang)->first();
-                    $laporanPekerjaanBarang->update([
-                        'status' => 4
-                    ]);
-                }
+                // if($this->preOrder->quotation && $this->preOrder->quotation->laporanPekerjaan && $this->preOrder->quotation->laporanPekerjaan->laporanPekerjaanBarang->where('id_barang', $preOrderDetail->id_barang)->first()){
+                //     $laporanPekerjaanBarang = $this->preOrder->quotation->laporanPekerjaan->laporanPekerjaanBarang->where('id_barang', $preOrderDetail->id_barang)->first();
+                //     $laporanPekerjaanBarang->update([
+                //         'status' => 4
+                //     ]);
+                // }
             }
         }
 
         $message = "Berhasil melakukan pembayaran";
         $this->pembayaran_sekarang = 0;
+        $this->emit('refreshPreOrder');
         $this->emit('finishSimpanData', 1, $message);
         return session()->flash('success', $message);
     }

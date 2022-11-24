@@ -144,7 +144,7 @@
                         <div class="col-md-8 col-8 fw-bold">
                             : @if ($quotation->laporanPekerjaan)
                                 @foreach ($quotation->laporanPekerjaan->teknisi as $item)
-                                    {{ $item->user->name }}
+                                    {{ $item->user->name }},
                                 @endforeach
                             @else
                                 -
@@ -185,7 +185,11 @@
                             Sales
                         </div>
                         <div class="col-md-8 col-8">
-                            : <span class="fw-bold">{{ $quotation->sales }}</span>
+                            : <span class="fw-bold">
+                                @foreach ($quotation->quotationSales as $item)
+                                    {{ $item->sales->nama }},
+                                @endforeach
+                            </span>
                         </div>
                     </div>
                     <div class="row mb-5">

@@ -4,29 +4,37 @@
             <a href="{{ route('pre-order') }}" class="btn btn-sm btn-icon btn-light me-5" data-bs-toggle="tooltip" data-bs-placement="top" title="Kembali">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
-            Detail PO
+            @if ($preOrder && $preOrder->quotation && $preOrder->quotation->laporanPekerjaan && $preOrder->quotation->laporanPekerjaan->signature != null && $preOrder->quotation->laporanPekerjaan->jam_selesai != null && $preOrder->status == 3)
+                PO Done
+            @elseif($preOrder && $preOrder->quotation && $preOrder->quotation->laporanPekerjaan && $preOrder->quotation->laporanPekerjaan->signature != null && $preOrder->quotation->laporanPekerjaan->jam_selesai != null)
+                Account Receivable
+            @else
+                Detail PO
+            @endif
         </h3>
         <div class="card-toolbar">
-            <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Bayar Pre Order" wire:click="$emit('onClickBayar')">
-                <i class="fa-solid fa-cash-register"></i> Bayar
-            </button>
-            <button class="btn btn-sm btn-outline btn-outline-success btn-edit mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Pre Order" wire:click="$emit('onClickEditPreOrder', {{ $preOrder }})">
-                <i class="bi bi-pencil-square"></i> Edit
-            </button>
-            @if ($total_bayar > 0)
-                <button class="btn btn-sm btn-danger mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Batalkan Pre Order" wire:click="$emit('onClickBatalPreOrder', {{ $preOrder->id }})">
-                    <i class="fa-solid fa-ban"></i> Batalkan
+            @if ($isControl == true && $preOrder->status != 3)
+                <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Bayar Pre Order" wire:click="$emit('onClickBayar')">
+                    <i class="fa-solid fa-cash-register"></i> Bayar
                 </button>
-                @if ($preOrder->status == 1)
-                    <button class="btn btn-sm btn-warning btn-proses mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ganti Status PO" wire:click="$emit('onClickChangeStatus', {{ $id_pre_order }}, 2)">
-                        <i class="fa-solid fa-rotate"></i> Proses
+                <button class="btn btn-sm btn-outline btn-outline-success btn-edit mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Pre Order" wire:click="$emit('onClickEditPreOrder', {{ $preOrder }})">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </button>
+                @if ($total_bayar > 0 && $preOrder->status != 3)
+                    <button class="btn btn-sm btn-danger mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Batalkan Pre Order" wire:click="$emit('onClickBatalPreOrder', {{ $preOrder->id }})">
+                        <i class="fa-solid fa-ban"></i> Batalkan
                     </button>
-                @elseif($preOrder->status == 2)
-                    <button class="btn btn-sm btn-success btn-success mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="PO Selesai" wire:click="$emit('onClickSelesai', {{ $id_pre_order }}, 3)">
-                        <i class="fa-solid fa-circle-check"></i> Selesai
-                    </button>
-                @elseif($preOrder->status == 3)
-                    <a href="{{ route('pre-order.invoice', ['id' => $preOrder->id]) }}" target="_blank" class="btn btn-sm btn-info btn-proses mx-2"><i class="fa-solid fa-print"></i>Cetak Invoice</a>
+                    @if ($preOrder->status == 1)
+                        <button class="btn btn-sm btn-warning btn-proses mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ganti Status PO" wire:click="$emit('onClickChangeStatus', {{ $id_pre_order }}, 2)">
+                            <i class="fa-solid fa-rotate"></i> Proses
+                        </button>
+                    @elseif($preOrder->status == 2)
+                        <button class="btn btn-sm btn-success btn-success mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="PO Selesai" wire:click="$emit('onClickSelesai', {{ $id_pre_order }}, 3)">
+                            <i class="fa-solid fa-circle-check"></i> Selesai
+                        </button>
+                    @elseif($preOrder->status == 3)
+                        <a href="{{ route('pre-order.invoice', ['id' => $preOrder->id]) }}" target="_blank" class="btn btn-sm btn-info btn-proses mx-2"><i class="fa-solid fa-print"></i>Cetak Invoice</a>
+                    @endif
                 @endif
             @endif
         </div>

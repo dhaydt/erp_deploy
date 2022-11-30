@@ -29,7 +29,8 @@ class LaporanPekerjaan extends Model
         'dikirim',
         'tanggal_estimasi',
         'confirmasi_customer_barang',
-        'is_emergency_call'
+        'is_emergency_call',
+        'is_check_detail',
     ];
 
     protected $appends = [
@@ -127,5 +128,13 @@ class LaporanPekerjaan extends Model
     public function teknisi()
     {
         return $this->hasMany(LaporanPekerjaanUser::class, 'id_laporan_pekerjaan');
+    }
+
+    public function catatanTeknisiPekerjaan(){
+        return $this->hasMany(CatatanTeknisiPekerjaan::class, 'id_laporan_pekerjaan');
+    }
+
+    public function quotation(){
+        return $this->hasOne(Quotation::class, 'id_laporan_pekerjaan');
     }
 }

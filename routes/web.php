@@ -13,6 +13,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KondisiController;
 use App\Http\Controllers\KostumerController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ManagementTugasController;
 use App\Http\Controllers\MerkController;
 use App\Http\Controllers\MetodePembayaranController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\RakController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TipeBarangController;
@@ -67,6 +69,17 @@ Route::middleware('auth.user')->group(function () {
         });
     });
 
+    Route::prefix('laporan')->group(function(){
+        Route::get('/account-payable', [LaporanController::class, 'accountPayable'])->name('laporan.account-payable');
+        Route::get('/account-receivable', [LaporanController::class, 'accountReceivable'])->name('laporan.account-receivable');
+        Route::get('/kalender', [LaporanController::class, 'kalender'])->name('laporan.kalender');
+        Route::get('/spareparts', [LaporanController::class, 'spareparts'])->name('laporan.spareparts');
+        Route::get('/stock-opname', [LaporanController::class, 'stockOpname'])->name('laporan.stock-opname');
+        Route::get('/log-activity', [LaporanController::class, 'logActivity'])->name('laporan.log-activity');
+        Route::get('/grafik-penjualan', [LaporanController::class, 'grafikPenjualan'])->name('laporan.grafik-penjualan');
+        Route::get('/profit-pre-order', [LaporanController::class, 'profitPreOrder'])->name('laporan.profit-pre-order');
+    });
+
     Route::middleware('auth.super-admin')->group(function(){
         Route::prefix('form-pekerjaan')->group(function () {
             Route::get('/', [FormPekerjaanController::class, 'index'])->name('form-pekerjaan');
@@ -103,6 +116,7 @@ Route::middleware('auth.user')->group(function () {
         Route::prefix('supplier')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('supplier');
             Route::get('/order', [SupplierController::class, 'order'])->name('supplier.order');
+            Route::get('/order/payable', [SupplierController::class, 'payable'])->name('supplier-order.payable');
             Route::get('/order/{id}', [SupplierController::class, 'orderDetail'])->name('supplier.order-detail');
             Route::get('/detail/{id}', [SupplierController::class, 'detail'])->name('supplier.detail');
         });
@@ -193,6 +207,12 @@ Route::middleware('auth.user')->group(function () {
 
         Route::prefix('inventory')->group(function(){
             Route::get('/', [InventoryController::class, 'index'])->name('inventory');
+            Route::get('/stock-opname', [InventoryController::class, 'stockOpname'])->name('inventory.stock-opname');
+        });
+
+        Route::prefix('rak')->group(function(){
+            Route::get('/', [RakController::class, 'index'])->name('rak');
+            Route::get('/detail/{id}', [RakController::class, 'detail'])->name('rak.detail');
         });
     });
 });

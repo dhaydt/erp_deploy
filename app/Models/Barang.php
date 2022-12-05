@@ -16,16 +16,25 @@ class Barang extends Model
         'stock',
         'min_stock',
         'harga',
+        'harga_modal',
         'id_merk',
         'id_satuan',
         'id_tipe_barang',
-        'deskripsi'
+        'deskripsi',
     ];
 
-    protected $appends = ['harga_formatted', 'sku'];
+    protected $appends = ['harga_formatted', 'sku', 'harga_modal_formatted', 'total_order'];
+
+    public function getTotalOrderAttribute(){
+        return PreOrderDetail::where('id_barang', $this->id)->count();
+    }
 
     public function getHargaFormattedAttribute(){
         return 'Rp '.number_format($this->harga, 0, ',', '.');
+    }
+
+    public function getHargaModalFormattedAttribute(){
+        return 'Rp.' . number_format($this->harga_modal,0,',','.');
     }
 
     public function merk(){
@@ -56,7 +65,7 @@ class Barang extends Model
         return $this->belongsTo(TipeBarang::class, 'id_tipe_barang');
     }
 
-    public function barangStockChange($jumlah, $status){
+    public function barangStockChange($jumlah, $status, $id_quotation = null){
         $barang = Barang::find($this->id);
 
         if ($status == 1 || $status == 4) {
@@ -74,7 +83,8 @@ class Barang extends Model
             'perubahan' => $jumlah,
             'tanggal_perubahan' => now(),
             'id_tipe_perubahan_stock' => $status,
-            'id_user' => session()->get('id_user')
+            'id_user' => session()->get('id_user'),
+            'id_quotation' => $id_quotation
         ]);
 
         if($status == 1 || $status == 4){
@@ -94,5 +104,21 @@ class Barang extends Model
     public function getSkuAttribute(){
         $helper = new HelperController;
         return "B" . $helper->format_num($this->id);
+    }
+
+    public function isiRak(){
+        return $this->hasMany(IsiRak::class, 'id_barang');
+    }
+
+    public function stockOpname(){
+        return $this->hasMany(StockOpname::class, 'id_barang');
+    }
+
+    public function preOrderDetail(){
+        return $this->hasMany(PreOrderDetail::class, 'id_barang');
+    }
+
+    public function totalOrder(){
+        return $this->hasMany(PreOrderDetail::class, 'id_barang')->count();
     }
 }

@@ -12,7 +12,7 @@ class PreOrderController extends Controller
     public function index()
     {
         $data['title'] = 'Pre Order';
-        $data['active'] = ['pre-order'];
+        $data['active'] = ['purchase-order','pre-order'];
         $data['breadCrumb'] = ['Pre Order', 'Data'];
 
         return view('pre-order.index', $data);
@@ -26,7 +26,7 @@ class PreOrderController extends Controller
         }
 
         $data['title'] = 'Pre Order Detail';
-        $data['active'] = ['pre-order'];
+        $data['active'] = ['purchase-order','pre-order'];
         $data['breadCrumb'] = ['Pre Order', 'Data', 'Detail'];
         $data['preOrder'] = $preOrder;
 
@@ -60,7 +60,7 @@ class PreOrderController extends Controller
 
     public function accountReceivable(){
         $data['title'] = 'Account Receivable';
-        $data['active'] = ['account-receivable'];
+        $data['active'] = ['accounts','receivable'];
         $data['breadCrumb'] = ['Account Receivable', 'Data'];
 
         return view('invoice.account-receivable', $data);

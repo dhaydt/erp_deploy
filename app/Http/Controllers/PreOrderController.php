@@ -6,14 +6,16 @@ use App\Models\PreOrder;
 use App\Models\User;
 use App\Models\WebConfig;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class PreOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $data['title'] = 'Pre Order';
         $data['active'] = ['purchase-order','pre-order'];
         $data['breadCrumb'] = ['Pre Order', 'Data'];
+        $data['show_modal'] = $request->show_modal;
 
         return view('pre-order.index', $data);
     }
@@ -68,7 +70,7 @@ class PreOrderController extends Controller
 
     public function done(){
         $data['title'] = 'Pre Order Done';
-        $data['active'] = ['done-pre-order'];
+        $data['active'] = ['purchase-order','done-pre-order'];
         $data['breadCrumb'] = ["Pre Order", 'Done'];
 
         return view('pre-order.done', $data);

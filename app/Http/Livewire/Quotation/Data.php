@@ -32,12 +32,15 @@ class Data extends Component
     public $id_project;
     public $status_kirim;
     public $status_konfirmasi;
+    public $status_quotation;
+    public $status_pekerjaan;
     public function render()
     {
         $this->listProject = ProjectV2::get();
-        if($this->cari != null || $this->tanggal_dibuat != null || $this->id_project != null || $this->status_kirim != null || $this->status_konfirmasi != null){
+        if($this->cari != null || $this->tanggal_dibuat != null || $this->id_project != null || $this->status_kirim != null || $this->status_konfirmasi != null || $this->status_quotation != null || $this->status_pekerjaan != null){
             $this->listQuotation = Quotation::where(function($query){
                 $query->where('keterangan', 'LIKE', '%' . $this->cari . '%')
+                ->orWhere('id', 'LIKE', '%' . $this->cari . '%')
                 ->orWhere('hal' ,'LIKE', '%' . $this->cari . '%')
                 ->orWhereHas('laporanPekerjaan', function($query){
                     $query->whereHas('project', function($query){
@@ -47,11 +50,27 @@ class Data extends Component
                 });
             })
             ->where(function($query){
-                $query->whereDate('created_at', $this->tanggal_dibuat)
-                ->orWhereHas('laporanPekerjaan', function($query){
-                    $query->where('id_project', $this->id_project);
-                })->orWhere('status', $this->status_kirim)
-                ->orWhere('konfirmasi', $this->status_konfirmasi);
+                if ($this->tanggal_dibuat != null || $this->id_project != null || $this->status_kirim != null || $this->status_konfirmasi != null || $this->status_quotation != null || $this->status_pekerjaan != null) {
+                    $query->whereDate('created_at', $this->tanggal_dibuat)
+                    ->orWhereHas('laporanPekerjaan', function($query){
+                        $query->where('id_project', $this->id_project)
+                        ->orWhere(function($query){
+                            if($this->status_pekerjaan == 0){
+                                $query->where('jam_mulai', null);
+                            }elseif($this->status_pekerjaan == 1){
+                                $query->where('jam_mulai', '!=', null)
+                                ->where('jam_selesai', null)
+                                ->where('signature', null);
+                            }elseif($this->status_pekerjaan == 2){
+                                $query->where('jam_mulai', '!=', null)
+                                ->where('jam_selesai', '!=', null)
+                                ->where('signature', '!=', null);
+                            }
+                        });
+                    })->orWhere('status', $this->status_kirim)
+                    ->orWhere('konfirmasi', $this->status_konfirmasi)
+                    ->orWhere('status_like', $this->status_quotation);
+                }
             })
             ->orderBy('created_at', 'DESC')
             ->paginate($this->total_show);
@@ -119,6 +138,8 @@ class Data extends Component
         $this->id_project = null;
         $this->status_kirim = null;
         $this->status_konfirmasi = null;
+        $this->status_quotation = null;
+        $this->status_pekerjaan = null;
     }
 
     public function quotationGagal($id){
@@ -151,7 +172,7 @@ class Data extends Component
         $message = "Quotation Berhasil";
 
         activity()->causedBy(HelperController::user())->log("Submit quotation to pre order");
-        return redirect()->route('pre-order')->with('success', $message);
+        return redirect()->route('pre-order', ['show_modal' => true])->with('success', $message);
         // return session()->flash('success', $mesasge);
     }
 }

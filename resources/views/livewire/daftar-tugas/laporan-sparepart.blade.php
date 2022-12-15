@@ -75,6 +75,30 @@
                                     @enderror
                                 </div>
                                 <div class="mb-5">
+                                    <label for="" class="form-label required">Version</label>
+                                    <select name="version" wire:model="version" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih" required>
+                                        <option value="">Pilih</option>
+                                        @foreach ($listVersion as $item)
+                                            <option value="{{ $item }}">{{ $item }} V</option>
+                                        @endforeach
+                                    </select>
+                                    @error('version')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="mb-5">
+                                    <label for="" class="form-label required">TIpe Barang</label>
+                                    <select name="id_tipe_barang" wire:model="id_tipe_barang" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih Barang" required>
+                                        <option value="">Pilih</option>
+                                        @foreach ($listTipeBarang as $item)
+                                            <option value="{{ $item->id }}">{{ $item->tipe_barang }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('id_tipe_barang')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="mb-5">
                                     <label for="" class="form-label required">Jumlah / Qty</label>
                                     <input type="number" class="form-control form-control-solid" name="qty" wire:model="qty" placeholder="Masukkan jumlah" required>
                                     @error('qty')
@@ -92,6 +116,13 @@
                                     <label for="" class="form-label">Keterangan Customer</label>
                                     <textarea name="keterangan_customer" wire:model="keterangan_customer" class="form-control form-control-solid" placeholder="Masukkan catatan"></textarea>
                                     @error('keterangan_customer')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="mb-5">
+                                    <label for="" class="form-label required">Estimasi Kembali</label>
+                                    <input type="datetime-local" name="estimasi" wire:model="estimasi" class="form-control form-control-solid" required>
+                                    @error('estimasi')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>
@@ -125,8 +156,9 @@
                    <th>SKU</th>
                    <th>Nama Barang</th>
                    <th>Tipe Barang</th>
-                   <th>Harga</th>
+                   <th>Version</th>
                    <th>Satuan</th>
+                   <th>Estimasi Kembali</th>
                    <th>Qty</th>
                    <th>Catatan Teknisi</th>
                    <th>Keterangan Customer</th>
@@ -145,14 +177,30 @@
                                     </a>
                                 </td>
                                 <td>{{ $item->barang->nama }}</td>
-                                <td>{{ $item->barang->tipeBarang->tipe_barang }}</td>
-                                <td>{{ $item->barang->harga_formatted }}</td>
+                                <td>{{ $item->tipeBarang ? $item->tipeBarang->tipe_barang : null }}</td>
+                                <td>
+                                    @if ($item->version)
+                                        {{ $item->version }} V
+                                    @endif
+                                </td>
                                 <td>{{ $item->barang->satuan->nama_satuan }}</td>
+                                <td>
+                                    @if ($item->estimasi)
+                                        {{ date('d-m-Y H:i', strtotime($item->estimasi)) }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->catatan_teknisi }}</td>
                                 <td>{{ $item->keterangan_customer }}</td>
                                 <td><?= $item->status_formatted ?></td>
                                 <td>
+                                    <div class="text-center">
+                                        @if ($item->tipeBarang && strtolower($item->tipeBarang->tipe_barang) == 'consumable')
+                                            C
+                                        @endif
+                                    </div>
                                     <div class="btn-group">
                                         @if ($item->status == 0 || $item->status == 1)
                                             <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" wire:click="$emit('onClickEditBarang', {{ $item->id }})">
@@ -168,7 +216,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="10" class="text-center text-gray-500">Tidak ada data</td>
+                            <td colspan="12" class="text-center text-gray-500">Tidak ada data</td>
                         </tr>
                     @endif
                  </tbody>
@@ -187,6 +235,16 @@
             $('select[name="id_barang"]').select2();
             $('select[name="id_barang"]').on('change', function(){
                 @this.set('id_barang', $(this).val())
+            })
+
+            $('select[name="version"]').select2();
+            $('select[name="version"]').on('change', function(){
+                @this.set('version', $(this).val())
+            })
+
+            $('select[name="id_tipe_barang"]').select2();
+            $('select[name="id_tipe_barang"]').on('change', function(){
+                @this.set('id_tipe_barang', $(this).val())
             })
         })
 

@@ -3,7 +3,10 @@
 @section('content')
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <div class="content flex-row-fluid" id="kt_content">
-        @php($log = \App\CPU\Helpers::getUserLogs(session()->get('user_log_id')))
+        @php
+            $activitiy = \App\CPU\Helpers::getUserActivity();
+            $log = \App\CPU\Helpers::getUserLogs();
+        @endphp
         <div class="card mb-5 mb-xl-10">
             <div class="card-body pt-9 pb-0">
                 <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
@@ -18,7 +21,7 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <a href="javascript:"
                                         class="text-gray-900 text-hover-primary fs-2 fw-bold me-1 text-capitalize">{{
-                                        $log->user->name }}</a>
+                                        $activitiy->user->name }}</a>
                                     <a href="javascript:">
                                         <span class="svg-icon svg-icon-1 svg-icon-primary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"
@@ -34,8 +37,11 @@
                                     </a>
                                     <a href="javascript:"
                                         class="btn btn-sm btn-light-success fw-bold ms-2 fs-8 py-1 px-3"
-                                        data-bs-toggle="modal" data-bs-target="#kt_modal_upgrade_plan">{{
-                                        \App\CPU\Helpers::getTipeUser($log->user->id_tipe_user) }}</a>
+                                        data-bs-toggle="modal" data-bs-target="#kt_modal_upgrade_plan">
+                                        @foreach (session()->get('list_tipe_user') as $item)
+                                            {{ $item }},
+                                        @endforeach
+                                    </a>
                                 </div>
                                 <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
                                     <a href="javascript:" data-bs-toggle="tooltip" title="Alamat IP"
@@ -71,6 +77,7 @@
                                                     fill="currentColor"></path>
                                             </svg>
                                         </span>
+
                                     </a>
                                     <a href="javascript:" data-bs-toggle="tooltip" title="Agen Pengguna"
                                         class="d-flex align-items-center text-gray-400 text-hover-primary mb-2">
@@ -167,9 +174,9 @@
                                                         d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
                                                 </svg>
                                             </span>
-                                            @if ($log->user->lastPasswordChange)
+                                            @if ($log->lastPasswordChange)
                                             @php($dated =
-                                            Carbon\Carbon::parse($log->user->lastPasswordChange)->isoFormat('dddd, D
+                                            Carbon\Carbon::parse($log->lastPasswordChange)->isoFormat('dddd, D
                                             MMMM Y - H:m'))
                                             <div class="fs-2 fw-bold counted" data-kt-countup="true"
                                                 data-kt-countup-value="4500" data-kt-countup-prefix="$"
@@ -197,17 +204,26 @@
                 @livewire('dashboard.quotation')
             </div>
             <div class="col-md-6 mb-5">
-                @livewire('dashboard.pre-order')
+                @livewire('dashboard.account-receivable')
             </div>
-            <div class="col-md-6  mb-5">
-                @livewire('dashboard.log-stock')
+            <div class="col-md-6 mb-5">
+                @livewire('dashboard.account-payable')
+            </div>
+            <div class="col-md-6 mb-5">
+                @livewire('dashboard.stock-opname')
+            </div>
+            <div class="col-md-6 mb-5">
+                @livewire('dashboard.stock-minimum')
+            </div>
+            <div class="col-md-6 mb-5">
+                @livewire('dashboard.pre-order')
             </div>
             <div class="col-md-6 mb-5">
                 @livewire('dashboard.supplier-order')
             </div>
-            <div class="col-md-6 mb-5">
+            {{-- <div class="col-md-6 mb-5">
                 @livewire('dashboard.jumlah-data')
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>

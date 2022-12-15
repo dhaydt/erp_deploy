@@ -21,6 +21,7 @@ class Barang extends Model
         'id_satuan',
         'id_tipe_barang',
         'deskripsi',
+        'version'
     ];
 
     protected $appends = ['harga_formatted', 'sku', 'harga_modal_formatted', 'total_order'];
@@ -38,7 +39,7 @@ class Barang extends Model
     }
 
     public function merk(){
-        return $this->belongsTo(Merk::class, 'id_merk');
+        return $this->belongsTo(Merk::class, 'id_merk')->withTrashed();
     }
 
     public function barangKategori(){
@@ -50,7 +51,7 @@ class Barang extends Model
     }
 
     public function satuan(){
-        return $this->belongsTo(Satuan::class, 'id_satuan');
+        return $this->belongsTo(Satuan::class, 'id_satuan')->withTrashed();
     }
 
     public function supplierBarang(){
@@ -62,7 +63,7 @@ class Barang extends Model
     }
 
     public function tipeBarang(){
-        return $this->belongsTo(TipeBarang::class, 'id_tipe_barang');
+        return $this->belongsTo(TipeBarang::class, 'id_tipe_barang')->withTrashed();
     }
 
     public function barangStockChange($jumlah, $status, $id_quotation = null){
@@ -120,5 +121,9 @@ class Barang extends Model
 
     public function totalOrder(){
         return $this->hasMany(PreOrderDetail::class, 'id_barang')->count();
+    }
+
+    public function rakLog(){
+        return $this->hasMany(RakLog::class, 'id_barang');
     }
 }

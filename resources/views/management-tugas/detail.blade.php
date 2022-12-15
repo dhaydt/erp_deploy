@@ -122,6 +122,14 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col-md-4 col-4">
+                            Nomor Pekerjaan
+                        </div>
+                        <div class="col-md-8 col-8 fw-bold">
+                            : {{ $laporanPekerjaan->kode_pekerjaan }}
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4 col-4">
                             Merk
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
@@ -158,7 +166,7 @@
                         </div>
                         <div class="col-md-8 col-8 fw-bold">
                             : @foreach ($laporanPekerjaan->teknisi as $item)
-                                {{ $item->user->name }},
+                                {{ $item->user ? $item->user->name : '-' }},
                             @endforeach
                         </div>
                     </div>
@@ -181,6 +189,14 @@
                 <div class="col-md-4 mb-5">
                     <div class="fw-bold mb-5">
                         Keterangan Pekerjaan
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4 col-4">
+                            Tanggal Pekerjaan
+                        </div>
+                        <div class="col-md-8 col-8">
+                            : {{ date('d/m/Y', strtotime($laporanPekerjaan->tanggal_pekerjaan)) }}
+                        </div>
                     </div>
                     <div class="row mb-5">
                         <div class="col-md-4 col-4">

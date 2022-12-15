@@ -44,12 +44,13 @@
                  <thead>
                   <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 sticky">
                    <th>No</th>
+                   <th>No Ref</th>
                    <th>Kode Quotation</th>
                    <th>Customer</th>
                    <th>User</th>
                    <th>Tipe Pembayaran</th>
                    <th>Metode Pembayaran</th>
-                   <th>Status Pekerjaan</th>
+                   {{-- <th>Status Pekerjaan</th> --}}
                    <th>Status Pembayaran</th>
                    <th>Keterangan</th>
                    <th>File</th>
@@ -61,6 +62,7 @@
                         @foreach ($listPreOrder as $index => $item)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
+                                <td>{{ $item->no_ref }}</td>
                                 <td>{{ $item->quotation? $item->quotation->no_ref : '-' }}</td>
                                 <td>{{ $item->customer ? $item->customer->nama : '-'}} {{ $item->customer ? $item->customer->kode : '-' }}</td>
                                 <td>
@@ -70,7 +72,7 @@
                                         Dikonfirmasi Pelanggan
                                     @endif
                                 </td>
-                                <td>{{ $item->tipePembayaran->nama_tipe }}</td>
+                                <td>{{ $item->tipePembayaran ? $item->tipePembayaran->nama_tipe : '-' }}</td>
                                 <td>
                                     @if ($item->metodePembayaran)
                                         {{ $item->metodePembayaran->nama_metode }}
@@ -78,8 +80,7 @@
                                         -
                                     @endif
                                 </td>
-                                <td>
-                                    {{-- <?= $item->status_formatted ?> --}}
+                                {{-- <td>
                                     @if ($item->quotation && $item->quotation->laporanPekerjaan)
                                         @if ($item->quotation->laporanPekerjaan->signature != null && $item->quotation->laporanPekerjaan->jam_selesai != null)
                                             <span class="badge badge-success">Selesai</span>
@@ -91,7 +92,7 @@
                                     @else
                                         Tidak ada pekerjaan
                                     @endif
-                                </td>
+                                </td> --}}
                                 <td><?= $item->status_pembayaran ?></td>
                                 <td><?= $item->keterangan ?? '-' ?></td>
                                 <td>

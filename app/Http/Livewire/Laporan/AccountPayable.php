@@ -29,7 +29,9 @@ class AccountPayable extends Component
             })->orWhereHas('user', function($query){
                 $query->where('name', 'LIKE', '%' . $this->cari . '%');
             });
-        })->paginate($this->total_show);
+        })->whereHas('supplier')
+        ->orderBy('updated_at', 'DESC')
+        ->paginate($this->total_show);
 
         $data['listSupplierOrder'] = $this->listSupplierOrder;
         return view('livewire.laporan.account-payable', $data);

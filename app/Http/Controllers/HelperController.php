@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CalenderPenagihan;
+use App\Models\LaporanPekerjaan;
+use App\Models\PreOrder;
+use App\Models\Quotation;
+use App\Models\SupplierOrder;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -73,18 +78,18 @@ class HelperController extends Controller
                     ]),
                 ])
             ]),
-            collect([
-                'nama' => 'Supplier Order',
-                'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.3" d="M18.041 22.041C18.5932 22.041 19.041 21.5932 19.041 21.041C19.041 20.4887 18.5932 20.041 18.041 20.041C17.4887 20.041 17.041 20.4887 17.041 21.041C17.041 21.5932 17.4887 22.041 18.041 22.041Z" fill="currentColor"/>
-                        <path opacity="0.3" d="M6.04095 22.041C6.59324 22.041 7.04095 21.5932 7.04095 21.041C7.04095 20.4887 6.59324 20.041 6.04095 20.041C5.48867 20.041 5.04095 20.4887 5.04095 21.041C5.04095 21.5932 5.48867 22.041 6.04095 22.041Z" fill="currentColor"/>
-                        <path opacity="0.3" d="M7.04095 16.041L19.1409 15.1409C19.7409 15.1409 20.141 14.7409 20.341 14.1409L21.7409 8.34094C21.9409 7.64094 21.4409 7.04095 20.7409 7.04095H5.44095L7.04095 16.041Z" fill="currentColor"/>
-                        <path d="M19.041 20.041H5.04096C4.74096 20.041 4.34095 19.841 4.14095 19.541C3.94095 19.241 3.94095 18.841 4.14095 18.541L6.04096 14.841L4.14095 4.64095L2.54096 3.84096C2.04096 3.64096 1.84095 3.04097 2.14095 2.54097C2.34095 2.04097 2.94096 1.84095 3.44096 2.14095L5.44096 3.14095C5.74096 3.24095 5.94096 3.54096 5.94096 3.84096L7.94096 14.841C7.94096 15.041 7.94095 15.241 7.84095 15.441L6.54096 18.041H19.041C19.641 18.041 20.041 18.441 20.041 19.041C20.041 19.641 19.641 20.041 19.041 20.041Z" fill="currentColor"/>
-                        </svg>',
-                'role' => ['Super Admin', 'Manager', 'Admin Gudang'],
-                'active' => 'supplier-order',
-                'route' => 'supplier.order'
-            ]),
+            // collect([
+            //     'nama' => 'Supplier Order',
+            //     'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //             <path opacity="0.3" d="M18.041 22.041C18.5932 22.041 19.041 21.5932 19.041 21.041C19.041 20.4887 18.5932 20.041 18.041 20.041C17.4887 20.041 17.041 20.4887 17.041 21.041C17.041 21.5932 17.4887 22.041 18.041 22.041Z" fill="currentColor"/>
+            //             <path opacity="0.3" d="M6.04095 22.041C6.59324 22.041 7.04095 21.5932 7.04095 21.041C7.04095 20.4887 6.59324 20.041 6.04095 20.041C5.48867 20.041 5.04095 20.4887 5.04095 21.041C5.04095 21.5932 5.48867 22.041 6.04095 22.041Z" fill="currentColor"/>
+            //             <path opacity="0.3" d="M7.04095 16.041L19.1409 15.1409C19.7409 15.1409 20.141 14.7409 20.341 14.1409L21.7409 8.34094C21.9409 7.64094 21.4409 7.04095 20.7409 7.04095H5.44095L7.04095 16.041Z" fill="currentColor"/>
+            //             <path d="M19.041 20.041H5.04096C4.74096 20.041 4.34095 19.841 4.14095 19.541C3.94095 19.241 3.94095 18.841 4.14095 18.541L6.04096 14.841L4.14095 4.64095L2.54096 3.84096C2.04096 3.64096 1.84095 3.04097 2.14095 2.54097C2.34095 2.04097 2.94096 1.84095 3.44096 2.14095L5.44096 3.14095C5.74096 3.24095 5.94096 3.54096 5.94096 3.84096L7.94096 14.841C7.94096 15.041 7.94095 15.241 7.84095 15.441L6.54096 18.041H19.041C19.641 18.041 20.041 18.441 20.041 19.041C20.041 19.641 19.641 20.041 19.041 20.041Z" fill="currentColor"/>
+            //             </svg>',
+            //     'role' => ['Super Admin', 'Manager', 'Admin Gudang'],
+            //     'active' => 'supplier-order',
+            //     'route' => 'supplier.order'
+            // ]),
             collect([
                 'nama' => 'Management Tugas',
                 'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -117,32 +122,32 @@ class HelperController extends Controller
                 'active' => 'daftar-tugas',
                 'route' => 'daftar-tugas'
             ]),
-            collect([
-                'nama' => 'Accounts',
-                'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.3" d="M3 3V17H7V21H15V9H20V3H3Z" fill="currentColor"/>
-                        <path d="M20 22H3C2.4 22 2 21.6 2 21V3C2 2.4 2.4 2 3 2H20C20.6 2 21 2.4 21 3V21C21 21.6 20.6 22 20 22ZM19 4H4V8H19V4ZM6 18H4V20H6V18ZM6 14H4V16H6V14ZM6 10H4V12H6V10ZM10 18H8V20H10V18ZM10 14H8V16H10V14ZM10 10H8V12H10V10ZM14 18H12V20H14V18ZM14 14H12V16H14V14ZM14 10H12V12H14V10ZM19 14H17V20H19V14ZM19 10H17V12H19V10Z" fill="currentColor"/>
-                    </svg>',
-                'role' => ['Super Admin', 'Manager'],
-                'active' => 'accounts',
-                'route' => null,
-                'children' => collect([
-                    collect([
-                        'nama' => 'Receivable',
-                        'icon' => '<span class="bullet bullet-dot"></span>',
-                        'role' => ['Super Admin', 'Manager'],
-                        'active' => 'receivable',
-                        'route' => 'pre-order.account-receivable'
-                    ]),
-                    collect([
-                        'nama' => 'Payable',
-                        'icon' => '<span class="bullet bullet-dot"></span>',
-                        'role' => ['Super Admin', 'Manager'],
-                        'active' => 'payable',
-                        'route' => 'supplier-order.payable'
-                    ]),
-                ])
-            ]),
+            // collect([
+            //     'nama' => 'Accounts',
+            //     'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //             <path opacity="0.3" d="M3 3V17H7V21H15V9H20V3H3Z" fill="currentColor"/>
+            //             <path d="M20 22H3C2.4 22 2 21.6 2 21V3C2 2.4 2.4 2 3 2H20C20.6 2 21 2.4 21 3V21C21 21.6 20.6 22 20 22ZM19 4H4V8H19V4ZM6 18H4V20H6V18ZM6 14H4V16H6V14ZM6 10H4V12H6V10ZM10 18H8V20H10V18ZM10 14H8V16H10V14ZM10 10H8V12H10V10ZM14 18H12V20H14V18ZM14 14H12V16H14V14ZM14 10H12V12H14V10ZM19 14H17V20H19V14ZM19 10H17V12H19V10Z" fill="currentColor"/>
+            //         </svg>',
+            //     'role' => ['Super Admin', 'Manager'],
+            //     'active' => 'accounts',
+            //     'route' => null,
+            //     'children' => collect([
+            //         collect([
+            //             'nama' => 'Receivable',
+            //             'icon' => '<span class="bullet bullet-dot"></span>',
+            //             'role' => ['Super Admin', 'Manager'],
+            //             'active' => 'receivable',
+            //             'route' => 'pre-order.account-receivable'
+            //         ]),
+            //         collect([
+            //             'nama' => 'Payable',
+            //             'icon' => '<span class="bullet bullet-dot"></span>',
+            //             'role' => ['Super Admin', 'Manager'],
+            //             'active' => 'payable',
+            //             'route' => 'supplier-order.payable'
+            //         ]),
+            //     ])
+            // ]),
             collect([
                 'nama' => 'Laporan',
                 'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -169,21 +174,21 @@ class HelperController extends Controller
                         'route' => 'laporan.account-receivable'
                     ]),
                     collect([
-                        'nama' => 'Kalender Payable & Receivable',
+                        'nama' => 'Kalender Accounts',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'kalender',
                         'route' => 'laporan.kalender'
                     ]),
                     collect([
-                        'nama' => 'Spareparts Akan Habis',
+                        'nama' => 'Stock Minimum',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'spareparts',
                         'route' => 'laporan.spareparts'
                     ]),
                     collect([
-                        'nama' => 'Stock Opname Miss',
+                        'nama' => 'Laporan Stok Opname',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'stock-opname-miss',
@@ -197,14 +202,14 @@ class HelperController extends Controller
                         'route' => 'laporan.log-activity'
                     ]),
                     collect([
-                        'nama' => 'Revenue Based on Invoice',
+                        'nama' => 'Revenue',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'grafik-penjualan',
                         'route' => 'laporan.grafik-penjualan'
                     ]),
                     collect([
-                        'nama' => 'Profit PO Keluar - PO Masuk',
+                        'nama' => 'Gross Profit',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'profit-po',
@@ -212,20 +217,7 @@ class HelperController extends Controller
                     ]),
                 ])
             ]),
-            collect([
-                'nama' => 'Rak',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
-                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <rect x="5" y="5" width="5" height="5" rx="1" fill="currentColor"/>
-                                <rect x="14" y="5" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
-                                <rect x="5" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
-                                <rect x="14" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
-                            </g>
-                        </svg>',
-                'role' => ['Super Admin', 'Manager', 'Admin Gudan'],
-                'active' => 'rak',
-                'route' => 'rak'
-            ]),
+
             collect([
                 'nama' => 'Inventory',
                 'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -256,6 +248,13 @@ class HelperController extends Controller
                         'role' => ['Super Admin', 'Manager', 'Admin Gudang'],
                         'active' => 'pinjam-meminjam',
                         'route' => 'pinjam-meminjam'
+                    ]),
+                    collect([
+                        'nama' => 'Rak',
+                        'icon' => '<span class="bullet bullet-dot"></span>',
+                        'role' => ['Super Admin', 'Manager', 'Admin Gudan'],
+                        'active' => 'rak',
+                        'route' => 'rak'
                     ]),
                 ])
             ]),
@@ -344,7 +343,7 @@ class HelperController extends Controller
                         'route' => 'merk'
                     ]),
                     collect([
-                        'nama' => 'Tupe Barang',
+                        'nama' => 'Tipe Barang',
                         'icon' => '<span class="bullet bullet-dot"></span>',
                         'role' => ['Super Admin', 'Manager'],
                         'active' => 'tipe-barang',
@@ -395,7 +394,7 @@ class HelperController extends Controller
                 ]),
             ]),
                 collect([
-                    'nama' => 'Pegaturan Web',
+                    'nama' => 'Pengaturan Web',
                     'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.3"
@@ -466,6 +465,15 @@ class HelperController extends Controller
                 'badge' => "<span class='badge badge-danger'>Dibatalkan / Ditolak</span>"
             ]),
         ]);
+    }
+
+    public static function getListVersion(){
+        $version = [];
+        for ($i=1; $i <= 10; $i++) {
+            array_push($version,$i);
+        }
+
+        return $version;
     }
 
     public function getListStatusResponse(){
@@ -587,5 +595,93 @@ class HelperController extends Controller
 
     static public function user(){
         return User::find(session()->get('id_user'));
+    }
+
+    static public function createAgenda(){
+        // Check Agenda Account Payable
+        $accountPayable = SupplierOrder::doesntHave('agendaPembayaran')
+        ->where('status_pembayaran', '!=', 2)
+        ->where('status_order', '!=', 0)
+        ->get();
+
+        foreach ($accountPayable as $item) {
+            $calenderPenagihan = CalenderPenagihan::where('tipe', 1)
+            ->where('id_accounts', $item->id)
+            ->where('tanggal', $item->tanggal_tempo_pembayaran)
+            ->first();
+            $description = 'Pembayaran Supplier Order ke ' . $item->supplier->name . ' sebesar ' . $item->total_harga_formatted . '. Silahkan lakukan pembayaran sebelum ' . date('d-m-Y', strtotime($item->tanggal_tempo_pembayaran));
+            if(!$calenderPenagihan){
+                CalenderPenagihan::create([
+                    'tipe' => 1,
+                    'id_accounts' => $item->id,
+                    'tanggal' => $item->tanggal_tempo_pembayaran,
+                    'description' => $description
+                ]);
+            }else{
+                $calenderPenagihan->update([
+                    'description' => $description
+                ]);
+            }
+        }
+
+        // Check Agenda Account Receivable
+        $accountReceivable = PreOrder::doesntHave('agendaPenagihan')
+        ->whereHas('quotation', function($query){
+            $query->whereHas('laporanPekerjaan', function($query){
+                $query->where('signature', '!=', null)
+                ->where('jam_selesai', '!=', null);
+            });
+        })->where('status', '!=', 3)->get();
+
+        foreach ($accountReceivable as $item) {
+            $calenderPenagihan = CalenderPenagihan::where('tipe', 2)
+            ->where('id_accounts', $item->id)
+            ->where('tanggal', $item->tanggal_tempo_pembayaran)
+            ->first();
+
+            $description = 'Penagihan PO ke ' . $item->customer->name . ' sebesar ' . $item->total_bayar_formatted . '. Silahkan lakukan pembayaran sebelum ' . date('d-m-Y', strtotime($item->tanggal_tempo_pembayaran));
+            if(!$calenderPenagihan){
+                CalenderPenagihan::create([
+                    'tipe' => 2,
+                    'id_accounts' => $item->id,
+                    'tanggal' => $item->tanggal_tempo_pembayaran,
+                    'description' => $description
+                ]);
+            }else{
+                $calenderPenagihan->update([
+                    'description' => $description
+                ]);
+            }
+        }
+
+        // Check Quotation
+        $quotation = Quotation::doesntHave('agendaPembuatan')
+        ->get();
+
+        foreach ($quotation as $item) {
+            $description = 'Pembuatan Quotation dilakukan pada tanggal ' . date('d-m-Y', strtotime($item->created_at));
+            CalenderPenagihan::create([
+                'tipe' => 3,
+                'id_accounts' => $item->id,
+                'tanggal' => $item->created_at,
+                'description' => $description
+            ]);
+        }
+
+        //Laporan Pekerjaan
+        $laporanPekerjaan = LaporanPekerjaan::doesntHave('agendaLaporanPekerjaan')
+        ->where('signature', '!=', null)
+        ->where('jam_selesai', '!=', null)
+        ->get();
+        foreach ($laporanPekerjaan as $item) {
+            $tanggalPekerjaan = $item->tanggal_pekerjaan ? date('d-m-Y', strtotime($item->tanggal_pekerjaan)) : '-';
+            $description = 'Pekerjaan dengan kode pekerjaan ('. $item->no_ref .') pada Customer '. $item->customer->nama . ' Dilakukan pekerjaan pada tanggal ' . $tanggalPekerjaan;
+            CalenderPenagihan::create([
+                'tipe' => 4,
+                'id_accounts' => $item->id,
+                'tanggal' => $item->tanggal_pekerjaan,
+                'description' => $description
+            ]);
+        }
     }
 }

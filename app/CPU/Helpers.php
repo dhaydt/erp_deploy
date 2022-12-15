@@ -2,6 +2,7 @@
 
 namespace App\CPU;
 
+use App\Models\ActivityLog;
 use App\Models\Barang;
 use App\Models\Kondisi;
 use App\Models\LaporanPekerjaan;
@@ -21,11 +22,6 @@ class Helpers
         $progress = LaporanPekerjaanUser::whereHas('laporanPekerjaan')->where('id_user', $id)->whereHas('laporanPekerjaan', function ($q) {
             $q->where('jam_mulai', '!=', null)->where('jam_selesai', null);
         })->count();
-
-        // $status = 'Tersedia';
-        // if ($progress) {
-        //     $status = 'Bekerja';
-        // }
 
         return $progress;
     }
@@ -341,18 +337,23 @@ class Helpers
         return $x;
     }
 
-    public static function getUserLogs($id)
+    public static function getUserActivity()
     {
-        $log = UserLog::with('user')->find($id);
-
+        // $log = UserLog::with('user')->find($id);
+        $log = ActivityLog::with('user')
+        ->where('causer_id', session()->get('id_user'))->orderBy('updated_at', 'DESC')->first();
         return $log;
     }
 
-    public static function getTipeUser($id)
-    {
-        $tipe = TipeUser::find($id);
+    public static function getUserLogs(){
+        $log = UserLog::with('user')->find(session()->get('id_user'));
+        return $log;
+    }
 
-        return $tipe->nama_tipe;
+    public static function getTipeUser($listTipeUser)
+    {
+        $tipe = null;
+        return $tipe ? $tipe->nama_tipe : null;
     }
 
     public static function regexUserAgent($ua)

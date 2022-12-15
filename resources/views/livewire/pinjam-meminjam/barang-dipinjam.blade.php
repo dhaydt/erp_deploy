@@ -18,16 +18,20 @@
             <thead>
             <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
                 <th>No</th>
-                <th>Kode Pekerjaan</th>
+                <th>Nama Proyek</th>
                 <th>SKU</th>
                 <th>Barang</th>
                 <th>Satuan</th>
-                <th>Harga</th>
+                <th>Estimasi Kembali</th>
                 <th>Jumlah / Qty</th>
+                <th>Version</th>
+                <th>Nomor ITT/ITS</th>
                 <th>Tipe Barang</th>
                 <th>Catatan Teknisi</th>
-                <th>Yang Meminjamkan</th>
                 <th>Status</th>
+                <th>Yang Meminjamkan</th>
+                <th>Peminjam</th>
+                <th>Tanggal Peminjaman</th>
                 <th>Aksi</th>
             </tr>
             </thead>
@@ -42,14 +46,35 @@
                                 {{ $item->barang->sku }}
                             </a>
                         </td>
-                        <td>{{ $item->barang->nama }}</td>
-                        <td>{{ $item->barang->satuan->nama_satuan }}</td>
-                        <td>{{ $item->barang->harga_formatted }}</td>
+                        <td>{{ $item->barang ? $item->barang->nama : '-' }}</td>
+                        <td>{{ $item->barang? $item->barang->satuan->nama_satuan : '-' }}</td>
+                        <td>
+                            @if ($item->estimasi)
+                                {{ date('d-m-Y H:i', strtotime($item->estimasi)) }}
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>{{ $item->qty }}</td>
-                        <td>{{ $item->barang->tipeBarang->tipe_barang }}</td>
+                        <td>{{ $item->version }} V</td>
+                        <td>{{ $item->nomorItt ? $item->nomorItt->nomor_itt : '-' }}</td>
+                        <td>{{ $item->tipeBarang ? $item->tipeBarang->tipe_barang : '-' }}</td>
                         <td>{{ $item->catatan_teknisi }}</td>
-                        <td>{{ $item->userMeminjamkan ? $item->userMeminjamkan->name : '-' }}</td>
                         <td><?= $item->status_formatted ?></td>
+                        <td>{{ $item->userMeminjamkan ? $item->userMeminjamkan->name : '-' }}</td>
+                        <td>{{ $item->userPeminjam ? $item->userPeminjam->name : '-' }}</td>
+                        <td>
+                            @php
+                                $laporanPekerjaanBarangLog = \App\Models\LaporanPekerjaanBarangLog::where('id_laporan_pekerjaan_barang', $item->id)
+                                ->where('status', 2)
+                                ->orderBy('updated_at', 'ASC')
+                                ->first();
+
+                                if($laporanPekerjaanBarangLog){
+                                    echo date('d-m-Y H:i', strtotime($laporanPekerjaanBarangLog->updated_at));
+                                }
+                            @endphp
+                        </td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Kembalikan Barang Kegudang" wire:click="$emit('onClickKembalikan', {{ $item->id }})">
@@ -61,7 +86,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="12" class="text-center text-gray-500">Tidak ada data</td>
+                    <td colspan="16" class="text-center text-gray-500">Tidak ada data</td>
                 </tr>
             @endif
             </tbody>
@@ -83,7 +108,7 @@
                     </div>
                     <!--end::Close-->
                 </div>
-                <form action="#" wire:submit.prevent="simpanDataPeminjamanBarang">
+                <form action="#" wire:submit.prevent="simpanDataPeminjamanBarang" id="form_peminjaman_barang">
 
                     <div class="modal-body">
                         <div class="row mb-5">
@@ -232,6 +257,30 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+                            <div class="col-md-4 mb-5">
+                                <label for="" class="form-label required">Version</label>
+                                <select name="version" wire:model="version" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#modal_tambah_peminjaman_barang" required>
+                                    <option value="">Pilih</option>
+                                    @foreach ($listVersion as $item)
+                                        <option value="{{ $item }}">{{ $item }} V</option>
+                                    @endforeach
+                                </select>
+                                @error('version')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 mb-5">
+                                <label for="" class="form-label required">Tipe</label>
+                                <select name="id_tipe_barang" wire:model="id_tipe_barang" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#modal_tambah_peminjaman_barang" required>
+                                    <option value="">Pilih</option>
+                                    @foreach ($listTipeBarang as $item)
+                                        <option value="{{ $item->id }}">{{ $item->tipe_barang }}</option>
+                                    @endforeach
+                                </select>
+                                @error('id_tipe_barang')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 
@@ -259,7 +308,7 @@
                     <!--end::Close-->
                 </div>
 
-                <form action="#" wire:submit.prevent="balikanBarangPinjaman">
+                <form action="#" wire:submit.prevent="balikanBarangPinjaman" id="form_peminjaman_barang">
                     <div class="modal-body">
                         @include('helper.alert-message')
                         <div class="text-center">
@@ -355,6 +404,8 @@
 
         window.addEventListener('contentChange', function(){
             $('select[name="id_laporan_pekerjaan"]').select2();
+            $('select[name="id_tipe_barang"]').select2();
+            $('select[name="version"]').select2();
             $('select[name="id_barang"]').select2();
         })
 
@@ -362,8 +413,16 @@
             @this.set('id_laporan_pekerjaan', $(this).val())
         });
 
-        $('select[name="id_barang"]').on('change', function(){
+        $('#form_peminjaman_barang select[name="id_barang"]').on('change', function(){
             @this.set('id_barang', $(this).val())
+        });
+
+        $('select[name="id_tipe_barang"]').on('change', function(){
+            @this.set('id_tipe_barang', $(this).val())
+        });
+
+        $('select[name="version"]').on('change', function(){
+            @this.set('version', $(this).val())
         });
 
         Livewire.on('onClickBatalkan', async (id) => {

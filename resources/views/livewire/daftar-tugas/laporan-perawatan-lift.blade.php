@@ -16,7 +16,7 @@
             </div>
             <div class="row mb-5">
                 <div class="col-md-3">
-                    @include('helper.form-pencarian', ['model' => 'cari'])
+                    {{-- @include('helper.form-pencarian', ['model' => 'cari']) --}}
                 </div>
             </div>
 
@@ -27,61 +27,39 @@
                             <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
                                 <th>No</th>
                                 <th>Nama Pekerjaan</th>
-                                <th style="width: 200px;">Pekerjaan</th>
+                                {{-- <th style="width: 200px;">Pekerjaan</th> --}}
                                 <th style="width: 200px;">Kondisi</th>
-                                <th></th>
-                                <th>Keterangan</th>
+                                <th style="width: 300px;">Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (count($listTemplatePekerjaan) > 0)
                                 @php
-                                    $number = 0;
+                                    $nomor_level1 = 0;
                                 @endphp
-                                @foreach ($listTemplatePekerjaan as $index => $item)
-                                <tr class="fw-bold bg-light-success">
-                                    <td>{{ $number + 1 }}</td>
-                                    <td>{{ $item->nama_pekerjaan }}</td>
-                                    <td>
-                                        @if ($item->kondisi != null && is_array(json_decode($item->kondisi)))
-                                            @foreach (json_decode($item->kondisi) as $kondisi)
-                                                {{ $kondisi }}
-                                            @endforeach
-                                        @endif
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                @foreach ($listTemplatePekerjaan as $item)
+                                    <tr class="bg-light-success fw-bold">
+                                        <td>{{ \App\CPU\Helpers::numberToLetter($nomor_level1 + 1) }}</td>
+                                        <td>{{ $item->nama_pekerjaan }}</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
                                     @php
-                                        $nomor_anak = 0;
+                                        $nomor_level2 = 0;
                                     @endphp
-                                    @foreach ($item->children as $value)
-                                        @if ($value->periode != null && is_array(json_decode($value->periode)) && in_array($periode, json_decode($value->periode)))
+                                    @foreach ($item->detail as $value)
+                                        @if ($value->periode != null && is_array(json_decode($value->periode)) && in_array($periode,json_decode($value->periode)))
+                                            @php
+                                                $dataPekerjaanChecklist = \App\Models\LaporanPekerjaanChecklist::where('id_laporan_pekerjaan', $id_laporan_pekerjaan)
+                                                ->where('id_template_pekerjaan_detail', $value->id)->first();
+                                                $dataPekerjaan = null;
+                                                if ($dataPekerjaanChecklist) {
+                                                    $dataPekerjaan = json_decode($dataPekerjaanChecklist->pekerjaan);
+                                                }
+                                            @endphp
                                             <tr>
-                                                <td></td>
-                                                <td>{{ $number + 1 }}.{{ $nomor_anak + 1 }}</td>
+                                                <td>{{ $nomor_level2 + 1 }}</td>
                                                 <td>{{ $value->nama_pekerjaan }}</td>
-                                                <td>
-                                                    @php
-                                                        $dataPekerjaanChecklist = \App\Models\LaporanPekerjaanChecklist::where('id_laporan_pekerjaan', $id_laporan_pekerjaan)
-                                                        ->where('id_template_pekerjaan_detail', $value->id)->first();
-                                                        $dataPekerjaan = null;
-                                                        if ($dataPekerjaanChecklist) {
-                                                            $dataPekerjaan = json_decode($dataPekerjaanChecklist->pekerjaan);
-                                                        }
-
-                                                    @endphp
-                                                    <div class="">
-                                                        <select name="pekerjaan" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih" data-id_template_pekerjaan_detail="{{ $value->id }}" multiple>
-                                                            <option value="">Pilih</option>
-                                                            @foreach ($listPekerjaan as $pekerjaan)
-                                                                <option value="{{ $pekerjaan->keterangan }}" @if($dataPekerjaan && in_array($pekerjaan->keterangan, $dataPekerjaan)) selected @endif>{{ $pekerjaan->keterangan }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </td>
                                                 <td>
                                                     <div class="">
                                                         <select name="kondisi" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih" data-id_template_pekerjaan_detail="{{ $value->id }}">
@@ -97,15 +75,48 @@
                                                 </td>
                                             </tr>
                                             @php
-                                                $nomor_anak++;
+                                                $nomor_level3 = 0;
+                                            @endphp
+                                            @foreach ($value->children as $child)
+                                                @php
+                                                    $dataPekerjaanChecklist = \App\Models\LaporanPekerjaanChecklist::where('id_laporan_pekerjaan', $id_laporan_pekerjaan)
+                                                    ->where('id_template_pekerjaan_detail', $child->id)->first();
+                                                    $dataPekerjaan = null;
+                                                    if ($dataPekerjaanChecklist) {
+                                                        $dataPekerjaan = json_decode($dataPekerjaanChecklist->pekerjaan);
+                                                    }
+                                                @endphp
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ $nomor_level2 + 1 }}.{{ $nomor_level3 + 1 }} {{ $child->nama_pekerjaan }}</td>
+                                                    <td>
+                                                        <div class="">
+                                                            <select name="kondisi" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih" data-id_template_pekerjaan_detail="{{ $value->id }}">
+                                                                <option value="">Pilih</option>
+                                                                @foreach ($listKondisi as $kondisi)
+                                                                    <option value="{{ $kondisi->keterangan }}" @if($dataPekerjaanChecklist && $kondisi->keterangan == $dataPekerjaanChecklist->kondisi) selected @endif>{{ $kondisi->keterangan }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <textarea name="keterangan" class="form-control form-control-solid" placeholder="Masukkan keterangan" data-id_template_pekerjaan_detail="{{ $value->id }}">{{ $dataPekerjaanChecklist ? $dataPekerjaanChecklist->keterangan : null }}</textarea>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            @php
+                                                $nomor_level2++;
                                             @endphp
                                         @endif
                                     @endforeach
+                                    @php
+                                        $nomor_level1++;
+                                    @endphp
                                 @endforeach
                             @else
-                            <tr>
-                                <td colspan="9" class="text-center text-gray-500">Tidak ada data</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-500">Tidak ada data</td>
+                                </tr>
                             @endif
                         </tbody>
                     </table>

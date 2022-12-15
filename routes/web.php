@@ -30,23 +30,15 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TipeBarangController;
 use App\Http\Controllers\WebConfigurationController;
 use App\Http\Controllers\WorkerController;
+use App\Models\Barang;
+use App\Models\LaporanPekerjaanBarang;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('testing')->group(function () {
-    Route::get('/', function () {
-        $quotation = Quotation::first();
-        $data['quotation'] = $quotation;
-
-        return view('mail.send-quotation', $data);
-    })->name('testing');
-    Route::get('/export-pdf', [DashboardController::class, 'exportPdf'])->name('testing.export-pdf');
-    Route::get('/view-mail', function () {
-        $data['quotation'] = Quotation::find(3);
-
-        return view('mail.send-quotation', $data);
-    });
+Route::get('/testing', function(){
+    $laporanPekerjaanBarang = LaporanPekerjaanBarang::with('nomotItt')->get();
+    return $laporanPekerjaanBarang;
 });
 
 Route::get('/foo', function () {
@@ -56,6 +48,10 @@ Route::get('/foo', function () {
 Route::get('/login', [AutentikasiController::class, 'login'])->name('login');
 Route::post('/login', [AutentikasiController::class, 'postLogin'])->name('post.login');
 Route::get('/logout', [AutentikasiController::class, 'logout'])->name('logout');
+Route::get('/forgot-password', [AutentikasiController::class, 'forgotPassword'])->name('forgot-password');
+Route::post('/forgot-password', [AutentikasiController::class, 'postForgotPassword'])->name('post.forgot-password');
+Route::post('/reset-ulang-password', [AutentikasiController::class, 'postResetUlangPassword'])->name('post.reset-ulang-password');
+Route::get('/reset-ulang-password/{token}', [AutentikasiController::class, 'resetUlangPassword'])->name('reset-ulang-password');
 
 Route::middleware('auth.user')->group(function () {
     Route::middleware('auth.pekerja')->group(function(){

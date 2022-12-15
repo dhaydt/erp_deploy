@@ -6,8 +6,11 @@ use App\Http\Controllers\HelperController;
 use App\Models\Barang;
 use App\Models\LaporanPekerjaan;
 use App\Models\LaporanPekerjaanBarang;
+use App\Models\LaporanPekerjaanBarangLog;
+use App\Models\NomorPeminjamanHarian;
 use App\Models\QuotationDetail;
 use App\Models\SupplierOrderDetailTemp;
+use App\Models\TipeBarang;
 use Livewire\Component;
 
 class LaporanSparepart extends Component
@@ -30,14 +33,22 @@ class LaporanSparepart extends Component
     public $tambahBarang = false;
     public $listBarang = [];
     public $barang;
+    public $version;
+    public $id_tipe_barang;
+    public $estimasi;
+
+    public $listTipeBarang;
+    public $listVersion;
     public function render()
     {
+        $this->listTipeBarang = TipeBarang::get();
+        $this->listVersion = HelperController::getListVersion();
         $this->listBarang = Barang::get();
         $this->listLaporanPekerjaanBarang = LaporanPekerjaanBarang::where(function($query){
             $query->whereHas('barang', function($query){
                 $query->where('nama', 'LIKE', '%' . $this->cari . '%');
             });
-        })->where('id_laporan_pekerjaan', $this->id_laporan_pekerjaan)->get();
+        })->where('is_laporan_pinjam', '!=', 1)->where('id_laporan_pekerjaan', $this->id_laporan_pekerjaan)->get();
         if($this->id_barang){
             $this->barang = Barang::find($this->id_barang);
         }
@@ -62,6 +73,11 @@ class LaporanSparepart extends Component
         $this->catatan_teknisi = $laporanPekerjaanBarang->catatan_teknisi;
         $this->keterangan_customer = $laporanPekerjaanBarang->keterangan_customer;
         $this->qty = $laporanPekerjaanBarang->qty;
+        $this->version = $laporanPekerjaanBarang->version;
+        $this->id_tipe_barang = $laporanPekerjaanBarang->id_tipe_barang;
+        if ($laporanPekerjaanBarang->estimasi) {
+            $this->estimasi = date('Y-m-d H:i', strtotime($laporanPekerjaanBarang->estimasi));
+        }
     }
 
     public function hapusLaporanPekerjaanBarang($id){
@@ -99,14 +115,27 @@ class LaporanSparepart extends Component
             'qty' => 'required|numeric',
             'catatan_teknisi' => 'nullable|string',
             'keterangan_customer' => 'nullable|string',
+            'version' => 'required|numeric',
+            'id_tipe_barang' => 'required|numeric',
+            'estimasi' => 'required|string',
         ], [
             'id_barang.required' => 'Barang belum dipilih',
             'id_barang.numeric' => 'Data barang tidak valid !',
             'qty.required' => 'Jumlah barang tidak boleh kosong',
             'qty.numeric' => 'Jumlah barang tidak valid !',
             'catatan_teknisi.string' => 'Catatan teknisi tidak valid !',
-            'keterangan_customer' => 'Keterangan customer tidak valid !'
+            'keterangan_customer' => 'Keterangan customer tidak valid !',
         ]);
+
+        $laporanPekerjaanBarang = LaporanPekerjaanBarang::where('id', $this->id_laporan_pekerjaan_barang)->first();
+        if($laporanPekerjaanBarang && $laporanPekerjaanBarang->nomor_itt != $this->nomor_itt){
+            $checkLaporanPekerjaanBarangNomorITT = LaporanPekerjaanBarang::where('nomor_itt', $this->nomor_itt)
+            ->whereDate('updated_at', now())->first();
+            if($checkLaporanPekerjaanBarangNomorITT){
+                $message = "Nomor ITT sudah digunakan. Silahkan gunakan nomor lainnya";
+                return session()->flash('fail', $message);
+            }
+        }
 
         // Check data barang
         $barang = Barang::find($this->id_barang);
@@ -144,13 +173,13 @@ class LaporanSparepart extends Component
                 'stock_sekarang' => $stock_sekarang,
                 'harga_satuan' => $barang->harga,
                 'status' => 0,
-                'keterangan' => null
+                'keterangan' => null,
             ]);
             $message = "Jumlah yang diminta lebih besar dari stock, silahkan hubungi warehouse";
             return session()->flash('fail', $message);
         }
 
-        LaporanPekerjaanBarang::updateOrCreate([
+        $laporanPekerjaanBarang = LaporanPekerjaanBarang::updateOrCreate([
             'id' => $this->id_laporan_pekerjaan_barang
         ], [
             'id_laporan_pekerjaan' => $this->id_laporan_pekerjaan,
@@ -160,7 +189,15 @@ class LaporanSparepart extends Component
             'catatan_teknisi' => $this->catatan_teknisi,
             'status' => 1,
             'konfirmasi' => 0,
-            'peminjam' => session()->get('id_user')
+            'peminjam' => session()->get('id_user'),
+            'version' => $this->version,
+            'id_tipe_barang' => $this->id_tipe_barang,
+            'estimasi' => date('Y-m-d H:i:s', strtotime($this->estimasi)),
+        ]);
+
+        LaporanPekerjaanBarangLog::create([
+            'id_laporan_pekerjaan_barang' => $laporanPekerjaanBarang->id,
+            'status' => 1
         ]);
 
         $laporanPekerjaan = LaporanPekerjaan::find($this->id_laporan_pekerjaan);
@@ -189,5 +226,8 @@ class LaporanSparepart extends Component
         $this->keterangan_customer = null;
         $this->catatan_teknisi = null;
         $this->qty = null;
+        $this->id_tipe_barang = null;
+        $this->version = null;
+        $this->estimasi = null;
     }
 }

@@ -1,4 +1,15 @@
 <div>
+    <div class="text-end">
+        <button class="btn btn-sm btn-outline btn-outline-primary mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="New ITT/ITS" wire:click="newItt" @if($btnStartItt == true) disabled @endif>
+            # New ITT/ITS
+        </button>
+        <button class="btn btn-sm btn-outline btn-outline-primary mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Start ITT/ITS" wire:click="startItt" @if($btnStartItt == false) disabled @endif>
+            # Start ITT/ITS
+        </button>
+        <button class="btn btn-sm btn-outline btn-outline-primary mx-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Tambah Permintaan Barang" wire:click="$emit('onClickTambahPermintaanBarang')">
+            <i class="bi bi-plus-circle"></i> Permintaan Barang
+        </button>
+    </div>
     @include('helper.alert-message')
     <div class="text-center">
         @include('helper.simple-loading', ['target' => 'cari,hapusBarang', 'message' => 'Memuat data...'])
@@ -14,16 +25,19 @@
             <thead>
             <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
                 <th>No</th>
-                <th>Kode Pekerjaan</th>
+                <th>Nama Proyek</th>
                 <th>SKU</th>
                 <th>Barang</th>
                 <th>Satuan</th>
-                <th>Harga</th>
+                <th>Estimasi Kembali</th>
                 <th>Jumlah / Qty</th>
+                <th>ITT/ITS</th>
+                <th>Version</th>
                 <th>Tipe Barang</th>
                 <th>Catatan Teknisi</th>
                 <th>Peminjam</th>
                 <th>Status</th>
+                <th>Tanggal Peminjaman</th>
                 <th>Aksi</th>
             </tr>
             </thead>
@@ -40,16 +54,53 @@
                         </td>
                         <td>{{ $item->barang->nama }}</td>
                         <td>{{ $item->barang->satuan->nama_satuan }}</td>
-                        <td>{{ $item->barang->harga_formatted }}</td>
+                        <td>
+                            @if ($item->estimasi)
+                                {{ date('d-m-Y H:i', strtotime($item->estimasi)) }}
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>{{ $item->qty }}</td>
-                        <td>{{ $item->barang->tipeBarang->tipe_barang }}</td>
+                        <td class="text-center">{{ $item->nomorItt ? $item->nomorItt->nomor_itt : '-' }}
+                            @if ($item->nomorItt)
+                                <span class="" style="cursor: pointer" wire:click="setIdLaporanPekerjaanBarang({{ $item->id }})">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                                @if ($id_laporan_pekerjaan_barang == $item->id)
+                                    <div class="text-center mb-1">
+                                        <input type="number" class="form-control" name="nomor_itt" wire:model="nomor_itt">
+                                    </div>
+                                    <span class="mx-1" style="cursor: pointer" wire:click="closeEditItt" data-bs-toggle="tooltip" data-bs-placement="top" title="Close">
+                                        <i class="fa-regular fa-circle-xmark text-danger"></i>
+                                    </span>
+                                    <span class="mx-1" style="cursor: pointer" wire:click="simpanEditItt" data-bs-toggle="tooltip" data-bs-placement="top" title="Simpan">
+                                        <i class="fa-regular fa-circle-check text-success"></i>
+                                    </span>
+                                @endif
+                            @endif
+                        </td>
+                        <td>{{ $item->version }} V</td>
+                        <td>{{ $item->tipeBarang ? $item->tipeBarang->tipe_barang : '-' }}</td>
                         <td>{{ $item->catatan_teknisi }}</td>
                         <td>{{ $item->userPeminjam ? $item->userPeminjam->name : '-' }}</td>
                         <td><?= $item->status_formatted ?></td>
                         <td>
+                            @php
+                                $laporanPekerjaanBarangLog = \App\Models\LaporanPekerjaanBarangLog::where('id_laporan_pekerjaan_barang', $item->id)
+                                ->where('status', 1)
+                                ->orderBy('updated_at', 'ASC')
+                                ->first();
+
+                                if($laporanPekerjaanBarangLog){
+                                    echo date('d-m-Y H:i', strtotime($laporanPekerjaanBarangLog->updated_at));
+                                }
+                            @endphp
+                        </td>
+                        <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Abaikan Pinjaman Barang" wire:click="$emit('onClickAbaikan', {{ $item->id }})">
-                                    <i class="bi bi-x-circle"></i>
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </button>
                                 <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Konfirmasi Pinjaman Barang" wire:click="$emit('onClickConfirm', {{ $item->id }})">
                                     <i class="bi bi-check-circle"></i>
@@ -60,7 +111,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="12" class="text-center text-gray-500">Tidak ada data</td>
+                    <td colspan="15" class="text-center text-gray-500">Tidak ada data</td>
                 </tr>
             @endif
             </tbody>
@@ -160,6 +211,25 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
+                        <div class="mb-5">
+                            <label for="" class="form-label required">Rak</label>
+                            <select name="id_rak" class="form-select form-select-solid" wire:model="id_rak" data-control="select2" data-dropdown-parent="#modal_konfirmasi" data-placeholder="Pilih" required>
+                                <option value="">Pilih</option>
+                                @foreach ($listRak as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_rak }} (Jumlah {{ $item->isiRak->where('id_barang', $id_barang)->first() ? $item->isiRak->where('id_barang', $id_barang)->sum('jumlah') : '-' }})</option>
+                                @endforeach
+                            </select>
+                            @error('id_rak')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-5">
+                            <label for="" class="form-label required">Estimasi Kembali</label>
+                            <input type="datetime-local" name="estimasi" class="form-control form-control-solid" wire:model="estimasi" required>
+                            @error('estimasi')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
@@ -169,6 +239,8 @@
             </div>
         </div>
     </div>
+
+    @livewire('pinjam-meminjam.form-permintaan-barang')
 </div>
 
 @push('js')
@@ -176,6 +248,14 @@
         $(document).ready(function () {
 
         });
+
+        window.addEventListener('contentChange', function(){
+            $('select[name="id_rak"]').select2()
+
+            $('select[name="id_rak"]').on('change', function(){
+                @this.set('id_rak', $(this).val())
+            })
+        })
 
         Livewire.on('onClickAbaikan', async (id) => {
             const response = await alertConfirmCustom("Peringatan !", "Apakah kamu yakin ingin mengabaikan peminjangan barang ini?", 'Ya, Abaikan')
@@ -193,5 +273,11 @@
             $('.modal').modal('hide')
             alertMessage(status, message);
         })
+
+        Livewire.on('onClickTambahPermintaanBarang', () => {
+            Livewire.emit('refreshFormPermintaanBarang')
+            $('#modal_form_permintaan_barang').modal('show')
+        })
+
     </script>
 @endpush

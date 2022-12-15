@@ -16,6 +16,8 @@ class Form extends Component
     public $username;
     public $password;
     public $jabatan;
+    public $email;
+    public $phone;
     public $is_active;
     public $id_tipe_user;
     public $listTipeUser;
@@ -41,8 +43,10 @@ class Form extends Component
         $this->username = $user->username;
         $this->name = $user->name;
         $this->is_active = $user->is_active;
-        $this->id_tipe_user = $user->id_tipe_user;
         $this->jabatan = $user->jabatan;
+        $this->email = $user->email;
+        $this->phone = $user->phone;
+        $this->id_tipe_user = json_decode($user->id_tipe_user);
     }
 
     public function simpanDataUser(){
@@ -50,8 +54,10 @@ class Form extends Component
             'name' => 'required|string',
             'username' => 'required|string',
             'password' => 'nullable|string',
-            'id_tipe_user' => 'required|numeric',
-            'jabatan' => 'required|string'
+            'id_tipe_user' => 'required|array',
+            'jabatan' => 'required|string',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|numeric'
         ],[
             'name.required' => 'Nama tidak boleh kosong',
             'name.string' => 'Nama tidak valid !',
@@ -59,8 +65,11 @@ class Form extends Component
             'username.string' => 'Username tidak valid !',
             'password.string' => 'Password tidak valid !',
             'id_tipe_user.required' => 'Tipe User tidak boleh kosong',
-            'id_tipe_user.numeric' => 'Tipe user tidak valid !',
+            'id_tipe_user.array' => 'Tipe user tidak valid !',
             'jabatan.string' => 'Jabatan tidak valid !',
+            'email.email' => 'Email tidak valid !',
+            'phone.numeric' => 'Nomor HP tidak valid !',
+            'phone.digits_between'
         ]);
 
         $this->username = Str::slug($this->username);
@@ -76,10 +85,36 @@ class Form extends Component
                 $message = "Username sudah digunakan. silahkan gunakan username lainnya";
                 return $this->emit('finishDataUser', 0, $message);
             }
+
+            $user = User::where('email', $this->email)->first();
+            if($user){
+                $message = "Email sudah digunakan. silahkan gunakan email lainnya";
+                return $this->emit('finishDataUser', 0, $message);
+            }
+        }else{
+            $user = User::find($this->id_user);
+            if($user && $user->username != $this->username){
+                $checkUser = User::where('username', $this->username)->first();
+                if($checkUser){
+                    $message = "Username sudah digunakan oleh user lainnya. silahkan gunakan username lainnya";
+                    return $this->emit('finishDataUser', 0, $message);
+                }
+            }
+
+            if($user && $user->email != $this->email){
+                $checkUser = User::where('email', $this->email)->first();
+                if($checkUser){
+                    $message = "Email sudah digunakan oleh user lainnya. silahkan gunakan email lainnya";
+                    return $this->emit('finishDataUser', 0, $message);
+                }
+            }
         }
+
         $data['name'] = $this->name;
         $data['username'] = Str::slug($this->username);
         $data['jabatan'] = $this->jabatan;
+        $data['phone'] = $this->phone;
+        $data['email'] = $this->email;
         if($this->id_user == null && $this->password == null){
             $message = "Password harus diisi";
             return $this->emit('finishDataUser', 0, $message);
@@ -87,7 +122,7 @@ class Form extends Component
             $data['password'] = Hash::make($this->password);
         }
         $data['is_active'] = $this->is_active ? 1 : 0;
-        $data['id_tipe_user'] = $this->id_tipe_user;
+        $data['id_tipe_user'] = json_encode($this->id_tipe_user);
         User::updateOrCreate([
             'id' => $this->id_user
         ], $data);
@@ -106,5 +141,7 @@ class Form extends Component
         $this->is_active = null;
         $this->id_tipe_user = null;
         $this->jabatan = null;
+        $this->phone = null;
+        $this->email = null;
     }
 }

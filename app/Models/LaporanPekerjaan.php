@@ -34,11 +34,18 @@ class LaporanPekerjaan extends Model
     ];
 
     protected $appends = [
+        'no_ref',
         'kode_pekerjaan',
         'jam_mulai_formatted',
         'jam_selesai_formatted',
         'list_pekerja',
     ];
+
+    public function getNoRefAttribute(){
+        $helper = new HelperController();
+
+        return 'PK'.$helper->format_num($this->id);
+    }
 
     public function getListPekerjaAttribute()
     {
@@ -92,17 +99,17 @@ class LaporanPekerjaan extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'id_customer');
+        return $this->belongsTo(Customer::class, 'id_customer')->withTrashed();
     }
 
     public function project()
     {
-        return $this->belongsTo(ProjectV2::class, 'id_project');
+        return $this->belongsTo(ProjectV2::class, 'id_project')->withTrashed();
     }
 
     public function merk()
     {
-        return $this->belongsTo(Merk::class, 'id_merk');
+        return $this->belongsTo(Merk::class, 'id_merk')->withTrashed();
     }
 
     public function laporanPekerjaanBarang()
@@ -122,7 +129,7 @@ class LaporanPekerjaan extends Model
 
     public function formMaster()
     {
-        return $this->belongsTo(FormMaster::class, 'id_form_master');
+        return $this->belongsTo(FormMaster::class, 'id_form_master')->withTrashed();
     }
 
     public function teknisi()
@@ -136,5 +143,9 @@ class LaporanPekerjaan extends Model
 
     public function quotation(){
         return $this->hasOne(Quotation::class, 'id_laporan_pekerjaan');
+    }
+
+    public function agendaLaporanPekerjaan(){
+        return $this->hasOne(CalenderPenagihan::class, 'id_accounts')->where('tipe', 4);
     }
 }

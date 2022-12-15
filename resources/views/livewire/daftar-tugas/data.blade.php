@@ -27,6 +27,7 @@
                         <thead>
                             <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 sticky">
                                 <th>No</th>
+                                <th>Nomor Pekerjaan</th>
                                 <th>Customer</th>
                                 <th>Project</th>
                                 <th>Pekerja</th>
@@ -44,11 +45,12 @@
                                 @foreach ($listLaporanPekerjaan as $index => $item)
                                 <tr>
                                     <td>{{ ($page - 1) * $total_show + $index + 1 }}</td>
+                                    <td>{{ $item->kode_pekerjaan }}</td>
                                     <td>{{ $item->customer->nama }}</td>
                                     <td>{{ $item->project ? $item->project->nama : '-' }}</td>
                                     <td>
                                         @foreach ($item->teknisi as $nama)
-                                        {{ $nama->user->name }},
+                                        {{ $nama->user ?$nama->user->name : '-' }},
                                         @endforeach
                                     </td>
                                     <td>{{ $item->jam_mulai_formatted ?? '-' }}</td>
@@ -119,7 +121,7 @@
                                 @endforeach
                             @else
                             <tr>
-                                <td colspan="15" class="text-center text-gray-500">Tidak ada data</td>
+                                <td colspan="16" class="text-center text-gray-500">Tidak ada data</td>
                             </tr>
                             @endif
                         </tbody>
@@ -304,10 +306,18 @@
                             </div>
                             <div class="row mb-5">
                                 <div class="col-md-4 col-4">
+                                    Nomor Pekerjaan
+                                </div>
+                                <div class="col-md-8 col-8 fw-bold">
+                                    : {{ $laporanPekerjaan->kode_pekerjaan }}
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="col-md-4 col-4">
                                     Merk
                                 </div>
                                 <div class="col-md-8 col-8 fw-bold">
-                                    : {{ $laporanPekerjaan->merk->nama_merk }}
+                                    : {{ $laporanPekerjaan->merk ? $laporanPekerjaan->merk->nama_merk : '-' }}
                                 </div>
                             </div>
                             <div class="row mb-5">
@@ -315,7 +325,7 @@
                                     Nama Form
                                 </div>
                                 <div class="col-md-8 col-8 fw-bold">
-                                    : {{ $laporanPekerjaan->formMaster->nama }}
+                                    : {{ $laporanPekerjaan->formMaster ? $laporanPekerjaan->formMaster->nama : '-' }}
                                 </div>
                             </div>
                             <div class="row mb-5">
@@ -323,7 +333,7 @@
                                     Kode Form
                                 </div>
                                 <div class="col-md-8 col-8 fw-bold">
-                                    : {{ $laporanPekerjaan->formMaster->kode }}
+                                    : {{ $laporanPekerjaan->formMaster ? $laporanPekerjaan->formMaster->kode : '-' }}
                                 </div>
                             </div>
                             <div class="row mb-5">
@@ -340,7 +350,7 @@
                                 </div>
                                 <div class="col-md-8 col-8 fw-bold">
                                     : @foreach ($laporanPekerjaan->teknisi as $item)
-                                        {{ $item->user->name }},
+                                        {{ $item->user ? $item->user->name : '-' }},
                                     @endforeach
                                 </div>
                             </div>
@@ -353,6 +363,27 @@
                                         <span class="badge badge-warning">Laporan Pekerjaan</span>
                                     @else
                                         {{ $laporanPekerjaan->periode }} Bulan
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="col-md-4 col-4">
+                                    Tanggal Pekerjaan
+                                </div>
+                                <div class="col-md-8 col-8 fw-bold">
+                                    : <span class="fw-bold">{{ date('d-m-Y', strtotime($laporanPekerjaan->tanggal_pekerjaan)) }}</span>
+                                    <span class="fw-bold">Pukul {{ $laporanPekerjaan->jam_mulai ? date('H:i', strtotime($laporanPekerjaan->jam_mulai)) : '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="col-md-4 col-4">
+                                    Tanggal Estimasi
+                                </div>
+                                <div class="col-md-8 col-8 fw-bold">
+                                    : @if ($laporanPekerjaan->tanggal_estimasi)
+                                        <span class="fw-bold">{{ date('d-m-Y', strtotime($laporanPekerjaan->tanggal_estimasi)) }}</span>
+                                    @else
+                                        -
                                     @endif
                                 </div>
                             </div>

@@ -28,26 +28,7 @@
                         <i class="fa-solid fa-share-from-square"></i> Send All
                     </button>
                 </div>
-                {{-- <div class="col-md-7">
-                    <div class="row flex-row">
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Cari berdasarkan nama / project / nomor lift:</label>
-                            <input type="text" class="search-input form-control form-control-solid ps-13" name="cari" wire:model="cari" placeholder="Search...">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Cari berdasarkan Tanggal mulai / selesai:</label>
-                            <input type="date" placeholder="Tanggal mulai" name="cari" class="search-input form-control form-control-solid ps-13" wire:model='cari'>
-                        </div>
-                        <span class="position-absolute top-50 end-0 translate-middle-y lh-0 d-none me-5" data-kt-search-element="spinner">
-                            <span class="spinner-border h-15px w-15px align-middle text-gray-400"></span>
-                        </span>
-                    </div>
-                </div> --}}
-                {{-- <div class="col-2 d-flex justify-content-end">
-                    @include('helper.filter', ['model' => 'date1', 'model' => 'date2'])
-                </div> --}}
             </div>
-
 
             {{-- <div class="table-responsive"> --}}
                 <div class="tables w-100" style="position: relative !important">
@@ -55,7 +36,7 @@
                         <thead>
                             <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 sticky">
                                 <th>No</th>
-                                <th>Customer</th>
+                                <th>Nomor Pekerjaan</th>
                                 <th>Project</th>
                                 <th>No.MFG</th>
                                 <th>Pekerja</th>
@@ -65,6 +46,7 @@
                                 <th>Periode</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
+                                <th>Customer</th>
                                 <th>Form</th>
                                 <th>Jumlah Service</th>
                             </tr>
@@ -74,16 +56,15 @@
                             @foreach ($listLaporanPekerjaan as $index => $item)
                             <tr>
                                 <td>{{ ($page - 1) * $total_show + $index + 1 }}</td>
-                                <td>{{ $item->customer->nama }}</td>
+                                <td>{{ $item->kode_pekerjaan }}</td>
                                 <td>{{ $item->project ? $item->project->nama : '-' }}</td>
                                 <td>{{ $item->project ? $item->project->no_mfg : '-' }}</td>
                                 <td>
                                     @foreach ($item->teknisi as $nama)
-                                    {{ $nama->user->name }},
+                                    {{ $nama->user ? $nama->user->name : '-' }},
                                     @endforeach
                                 </td>
-                                <td>{{ Carbon\Carbon::parse($item->tanggal_pekerjaan)->locale('id')->isoFormat('DD/MM/YYYY')
-                                    ?? '-' }}</td>
+                                <td>{{ Carbon\Carbon::parse($item->tanggal_pekerjaan)->locale('id')->isoFormat('DD/MM/YYYY') ?? '-' }}</td>
                                 <td>{{ $item->jam_mulai_formatted ?? '-' }}</td>
                                 <td>
                                     @if ($item->jam_selesai)
@@ -145,6 +126,7 @@
                                         </a>
                                     </div>
                                 </td>
+                                <td>{{ $item->customer->nama }}</td>
                                 <td>{{ $item->formMaster->nama }} ({{ $item->formMaster->kode }})</td>
                                 <td>
                                     @php
@@ -162,7 +144,7 @@
                             @endforeach
                             @else
                             <tr>
-                                <td colspan="15" class="text-center text-gray-500">Tidak ada data</td>
+                                <td colspan="16" class="text-center text-gray-500">Tidak ada data</td>
                             </tr>
                             @endif
                         </tbody>

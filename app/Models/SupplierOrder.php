@@ -21,16 +21,23 @@ class SupplierOrder extends Model
         'keterangan',
         'id_tipe_pembayaran',
         'id_metode_pembayaran',
-        'status_pembayaran'
+        'status_pembayaran',
+        'tanggal_tempo_pembayaran'
     ];
 
     protected $appends = [
+        'no_ref',
         'status_pembayaran_formatted',
         'tanggal_order_formatted',
         'status_order_formatted',
         'total_harga_formatted',
         'status_pembayaran_formatted'
     ];
+
+    public function getNoRefAttribute(){
+        $helper = new HelperController;
+        return "SO" . $helper->format_num($this->id);
+    }
 
     public function getStatusPembayaranFormattedAttribute(){
         if($this->status_pembayaran == 0){
@@ -63,22 +70,26 @@ class SupplierOrder extends Model
     }
 
     public function supplier(){
-        return $this->belongsTo(Supplier::class, 'id_supplier');
+        return $this->belongsTo(Supplier::class, 'id_supplier')->withTrashed();
     }
 
     public function user(){
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'id_user')->withTrashed();
     }
 
     public function tipePembayaran(){
-        return $this->belongsTo(TipePembayaran::class, 'id_tipe_pembayaran');
+        return $this->belongsTo(TipePembayaran::class, 'id_tipe_pembayaran')->withTrashed();
     }
 
     public function metodePembayaran(){
-        return $this->belongsTo(MetodePembayaran::class, 'id_metode_pembayaran');
+        return $this->belongsTo(MetodePembayaran::class, 'id_metode_pembayaran')->withTrashed();
     }
 
     public function supplierOrderPembayaran(){
         return $this->hasMany(SupplierOrderPembayaran::class, 'id_supplier_order');
+    }
+
+    public function agendaPembayaran(){
+        return $this->hasOne(CalenderPenagihan::class, 'id_accounts')->where('tipe', 1);
     }
 }

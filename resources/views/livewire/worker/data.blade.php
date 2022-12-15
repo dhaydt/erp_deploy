@@ -29,6 +29,8 @@
                             <th>Status Aktif</th>
                             <th>Tipe User</th>
                             <th>Jabatan</th>
+                            <th>Email</th>
+                            <th>No Hp</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -42,8 +44,12 @@
                             <td>
                                 <?= $item->is_active_formatted ?>
                             </td>
-                            <td>{{ $item->tipeUser->nama_tipe }}</td>
+                            <td>
+                                {{ $item->nama_tipe_user }}
+                            </td>
                             <td>{{ $item->jabatan }}</td>
+                            <td>{{ $item->email }}</td>
+                            <td>{{ $item->phone }}</td>
                             <td>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip"
@@ -56,13 +62,9 @@
                                         wire:click="$emit('onClickHapus', {{ $item->id }})">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
-                                    <a href="{{ route('worker.detail', ['id' => $item->id]) }}"
-                                        class="btn btn-sm btn-icon btn-info" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Detail Worker">
-                                        <i class="bi bi-info-circle-fill"></i>
-                                    </a>
                                 </div>
                             </td>
+
                         </tr>
                         @endforeach
                         @else

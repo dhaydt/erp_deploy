@@ -39,13 +39,13 @@
                         @foreach ($listSupplierOrder as $index => $item)
                             <tr>
                                 <td>{{ ($page - 1) * $total_show + $index + 1 }}</td>
-                                <td>{{ $item->supplier->name }}</td>
+                                <td>{{ $item->supplier ? $item->supplier->name : '-' }}</td>
                                 <td>{{ $item->user->name }}</td>
                                 <td><?= $item->status_order_formatted['badge'] ?></td>
                                 <td><?= $item->status_pembayaran_formatted ?></td>
                                 <td>{{ $item->total_harga_formatted }}</td>
                                 <td>{{ $item->tanggal_order_formatted }}</td>
-                                <td>{{ $item->tipePembayaran->nama_tipe }}</td>
+                                <td>{{ $item->tipePembayaran ? $item->tipePembayaran->nama_tipe : '-' }}</td>
                                 <td>{{ $item->keterangan }}</td>
                                 <td>
                                     <div class="btn-group">

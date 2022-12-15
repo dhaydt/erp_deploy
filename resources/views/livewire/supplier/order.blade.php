@@ -13,6 +13,7 @@
          <thead>
           <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 sticky">
            <th>No</th>
+           <th>No Ref</th>
            <th>Supplier</th>
            <th>Pembuat</th>
            <th>Status Order</th>
@@ -21,6 +22,7 @@
            <th>Tanggal Order</th>
            <th>Tipe Pembayaran</th>
            <th>Keterangan</th>
+           <th>Tanggal Tempo Pembayaran</th>
            <th>Aksi</th>
           </tr>
          </thead>
@@ -29,14 +31,16 @@
                 @foreach ($listSupplierOrder as $index => $item)
                     <tr>
                         <td>{{ ($page - 1) * $total_show + $index + 1 }}</td>
-                        <td>{{ $item->supplier->name }}</td>
-                        <td>{{ $item->user->name }}</td>
+                        <td>{{ $item->no_ref }}</td>
+                        <td>{{ $item->supplier ? $item->supplier->name : '-' }}</td>
+                        <td>{{ $item->user ? $item->user->name : '-' }}</td>
                         <td><?= $item->status_order_formatted['badge'] ?></td>
                         <td><?= $item->status_pembayaran_formatted ?></td>
                         <td>{{ $item->total_harga_formatted }}</td>
                         <td>{{ $item->tanggal_order_formatted }}</td>
-                        <td>{{ $item->tipePembayaran->nama_tipe }}</td>
+                        <td>{{ $item->tipePembayaran ? $item->tipePembayaran->nama_tipe : '-' }}</td>
                         <td>{{ $item->keterangan }}</td>
+                        <td>{{ date('d-m-Y', strtotime($item->tanggal_tempo_pembayaran)) }}</td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Supplier Order" wire:click="$emit('onClickEdit', {{ $item->id }})">
@@ -54,7 +58,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="9" class="text-center text-gray-500">Tidak ada data</td>
+                    <td colspan="12" class="text-center text-gray-500">Tidak ada data</td>
                 </tr>
             @endif
          </tbody>

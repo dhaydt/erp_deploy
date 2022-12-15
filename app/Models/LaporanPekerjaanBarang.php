@@ -19,10 +19,21 @@ class LaporanPekerjaanBarang extends Model
         'status',
         'konfirmasi',
         'peminjam',
-        'meminjamkan'
+        'meminjamkan',
+        'id_tipe_barang',
+        'version',
+        'id_rak',
+        'estimasi',
+        'is_laporan_pinjam'
     ];
 
     protected $appends = ['status_formatted'];
+
+    // public function getNomorIttAttribute(){
+    //     $nomorItt = NomorItt::where('id_laporan_pekerjaan_barang', $this->id)->first();
+
+    //     return $nomorItt ? $nomorItt->nomor_itt : '-';
+    // }
 
     public function getStatusFormattedAttribute(){
         if($this->status == 1){
@@ -43,14 +54,30 @@ class LaporanPekerjaanBarang extends Model
     }
 
     public function barang(){
-        return $this->belongsTo(Barang::class, 'id_barang');
+        return $this->belongsTo(Barang::class, 'id_barang')->withTrashed();
     }
 
     public function userPeminjam(){
-        return $this->belongsTo(User::class, 'peminjam');
+        return $this->belongsTo(User::class, 'peminjam')->withTrashed();
     }
 
     public function userMeminjamkan(){
-        return $this->belongsTo(User::class, 'meminjamkan');
+        return $this->belongsTo(User::class, 'meminjamkan')->withTrashed();
+    }
+
+    public function tipeBarang(){
+        return $this->belongsTo(TipeBarang::class, 'id_tipe_barang')->withTrashed();
+    }
+
+    public function laporanPekerjaanBarangLog(){
+        return $this->hasMany(LaporanPekerjaanBarangLog::class, 'id_laporan_pekerjaan_barang');
+    }
+
+    public function rak(){
+        return $this->belongsTo(Rak::class, 'id_rak')->withTrashed();
+    }
+
+    public function nomorItt(){
+        return $this->hasOne(NomorItt::class, 'id_laporan_pekerjaan_barang')->orderBy('nomor_itt','ASC');
     }
 }
